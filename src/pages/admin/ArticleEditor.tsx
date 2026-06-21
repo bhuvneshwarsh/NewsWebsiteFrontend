@@ -44,7 +44,7 @@ export default function ArticleEditor() {
     if (isEdit && id) {
       // When editing we use the article id via admin route — fetch by id
       articlesApi.list({ all: true }).then(r => {
-        const found = r.data.data.items.find((a: any) => a.id === parseInt(id));
+        const found = r.data.data.items.find((a: any) => a.id === parseInt(id)) as any;
         if (found) {
           setTitle(found.title);
           setThumbnailUrl(found.thumbnailUrl ?? '');

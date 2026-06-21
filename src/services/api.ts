@@ -4,7 +4,9 @@ import type {
   PaginatedResult, EPaper, AdminStats, AuthUser, Category
 } from '../types';
 
-const api = axios.create({ baseURL: '/api' });
+const api = axios.create({
+  baseURL: (import.meta as any).env.VITE_API_BASE_URL || '/api'
+});
 
 // Attach JWT to every request
 api.interceptors.request.use(config => {
