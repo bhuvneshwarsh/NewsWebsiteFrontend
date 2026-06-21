@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           <div>
             <h3 className="font-serif text-xl font-bold text-white mb-2">
-              Cloud<span className="text-brand-500">News</span>
+              Prajatantr <span className="text-brand-500">Ki Gunj</span>
             </h3>
             <p className="text-sm leading-relaxed">
               Your trusted source for breaking news, in-depth stories, and the latest e-paper edition.
