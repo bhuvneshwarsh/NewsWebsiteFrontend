@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Quill editor min height */
+.ql-editor {
+  min-height: 320px;
+  font-size: 15px;
+  line-height: 1.7;
+}
