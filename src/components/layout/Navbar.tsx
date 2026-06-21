@@ -53,7 +53,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <Link to="/" className="font-serif text-2xl font-bold text-gray-900 tracking-tight">
-            Cloud<span className="text-brand-600">News</span>
+            Prajatantr <span className="text-brand-600">Ki Gunj</span>
           </Link>
 
           {/* Desktop category nav */}

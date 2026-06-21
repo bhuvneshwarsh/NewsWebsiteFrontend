@@ -34,7 +34,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-gray-800 pt-6 text-xs text-center">
-          © {year} CloudNews Lite. Built on Azure Serverless.
+          © {year} Prajatantr Ki Gunj | Developed and Maintained by Bhuvneshwar Sharma (Full Stack Web Developer).
         </div>
       </div>
     </footer>

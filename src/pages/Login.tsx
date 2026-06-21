@@ -52,7 +52,7 @@ export default function Login() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-8">
         <div className="text-center mb-8">
-          <h1 className="font-serif text-3xl font-bold text-gray-900">CloudNews</h1>
+          <h1 className="font-serif text-3xl font-bold text-gray-900">Prajatantr Ki Gunj</h1>
           <p className="text-gray-500 mt-1 text-sm">Admin Portal</p>
         </div>
 
@@ -69,7 +69,7 @@ export default function Login() {
               type="email" required
               value={email} onChange={e => setEmail(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-              placeholder="admin@cloudnews.com"
+              placeholder="admin@prajatantrkigunj.com"
             />
           </div>
           <div>
