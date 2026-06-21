@@ -2,9 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Quill editor min height */
+/* ── Breaking news ticker ─────────────────────────────────────────────── */
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-track {
+  display: inline-block;
+  animation: ticker 30s linear infinite;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* ── Quill editor ─────────────────────────────────────────────────────── */
 .ql-editor {
   min-height: 320px;
   font-size: 15px;
   line-height: 1.7;
 }
+
+/* ── Article prose body ───────────────────────────────────────────────── */
+.prose img {
+  border-radius: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.prose blockquote {
+  border-left-color: #ef4444;
+  background: #fef2f2;
+  padding: 1rem 1.25rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.prose a {
+  color: #dc2626;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── Scrollbar (thin, tasteful) ───────────────────────────────────────── */
+::-webkit-scrollbar       { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
