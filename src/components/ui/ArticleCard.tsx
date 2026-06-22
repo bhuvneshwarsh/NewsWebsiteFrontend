@@ -12,7 +12,7 @@ export default function ArticleCard({ article, featured = false }: Props) {
   const getLocalDate = (dateString: string) => {
     const date = new Date(dateString);
     const offset = date.getTimezoneOffset() * 60000;
-    return new Date(date.getTime() + offset);
+    return new Date(date.getTime() - offset);
   };
 
   const timeAgo = article.publishedAt
