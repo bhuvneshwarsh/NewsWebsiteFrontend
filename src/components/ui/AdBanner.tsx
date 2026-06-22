@@ -8,7 +8,7 @@ interface AdBannerProps {
 }
 
 // Your AdSense publisher ID — replace with your real one after approval
-const ADSENSE_CLIENT = 'ca-pub-XXXXXXXXXXXXXXXX';
+const ADSENSE_CLIENT = 'ca-pub-1078408816546297';
 
 export default function AdBanner({ slotId, format = 'auto', style, className }: AdBannerProps) {
   const adRef  = useRef<HTMLModElement>(null);
