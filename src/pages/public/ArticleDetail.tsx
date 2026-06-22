@@ -32,6 +32,12 @@ function extractImageFromHtml(html: string) {
   return match?.[1] ?? null;
 }
 
+const getLocalDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const offset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() + offset);
+};
+
 export default function ArticleDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -158,10 +164,10 @@ export default function ArticleDetailPage() {
                   <>
                     <span className="flex items-center gap-1.5">
                       <Clock size={14} />
-                      {format(new Date(article.publishedAt), 'dd MMM yyyy, h:mm a')}
+                      {format(getLocalDate(article.publishedAt), 'dd MMM yyyy, h:mm a')}
                     </span>
                     <span className="text-gray-300">
-                      ({formatDistanceToNow(new Date(article.publishedAt), { addSuffix: true })})
+                      ({formatDistanceToNow(getLocalDate(article.publishedAt), { addSuffix: true })})
                     </span>
                   </>
                 )}
