@@ -87,6 +87,10 @@ export default function Login() {
           >
             {loading ? 'Signing in…' : 'Sign In'}
           </button>
+          <div className="text-center text-sm text-gray-500 mt-2">
+            <span>Go to Home page </span>
+            <a href="/" className="text-brand-600 hover:underline">Home</a>
+          </div>
         </form>
       </div>
     </div>
