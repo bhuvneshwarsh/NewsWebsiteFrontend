@@ -53,7 +53,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-14">
           {/* Logo */}
           <Link to="/" className="font-serif text-2xl font-bold text-gray-900 tracking-tight">
-            Prajatantr <span className="text-brand-600">Ki Gunj</span>
+            प्रजातंत्र <span className="text-brand-600">की गूंज</span>
           </Link>
 
           {/* Desktop category nav */}
