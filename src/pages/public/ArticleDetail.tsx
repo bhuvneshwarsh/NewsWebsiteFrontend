@@ -4,15 +4,42 @@ import { articlesApi } from '../../services/api';
 import type { ArticleDetail } from '../../types';
 import { SkeletonText } from '../../components/ui/Skeleton';
 import AdBanner from '../../components/ui/AdBanner';
-import { Clock, Eye, User, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Clock, Eye, User, ChevronRight, ArrowLeft, Share2 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 
+function setMetaTag(property: string, content: string) {
+  let element = document.head.querySelector(`meta[property="${property}"]`) as HTMLMetaElement | null;
+  if (!element) {
+    element = document.createElement('meta');
+    element.setAttribute('property', property);
+    document.head.appendChild(element);
+  }
+  element.content = content;
+}
+
+function setMetaName(name: string, content: string) {
+  let element = document.head.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
+  if (!element) {
+    element = document.createElement('meta');
+    element.setAttribute('name', name);
+    document.head.appendChild(element);
+  }
+  element.content = content;
+}
+
+function extractImageFromHtml(html: string) {
+  const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+  return match?.[1] ?? null;
+}
+
 export default function ArticleDetailPage() {
-  const { slug }   = useParams<{ slug: string }>();
-  const navigate   = useNavigate();
-  const [article,  setArticle]  = useState<ArticleDetail | null>(null);
-  const [loading,  setLoading]  = useState(true);
-  const [error,    setError]    = useState('');
+  const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
+  const [article, setArticle] = useState<ArticleDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [shareMessage, setShareMessage] = useState('');
+  const [shareLoading, setShareLoading] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -23,6 +50,50 @@ export default function ArticleDetailPage() {
       .finally(() => setLoading(false));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [slug]);
+
+  useEffect(() => {
+    if (!article) return;
+
+    const pageUrl = `${window.location.origin}/news/${article.slug}`;
+    const pageTitle = article.title;
+    const pageDescription = article.content.replace(/<[^>]+>/g, '').slice(0, 160);
+    const imageUrl = article.thumbnailUrl || extractImageFromHtml(article.content) || `${window.location.origin}/favicon.ico`;
+
+    document.title = `${article.title} | Prajatantr Ki Gunj`;
+    setMetaName('description', pageDescription);
+    setMetaTag('og:title', pageTitle);
+    setMetaTag('og:description', pageDescription);
+    setMetaTag('og:url', pageUrl);
+    setMetaTag('og:type', 'article');
+    setMetaTag('og:image', imageUrl);
+    setMetaTag('twitter:title', pageTitle);
+    setMetaTag('twitter:description', pageDescription);
+    setMetaTag('twitter:image', imageUrl);
+    setMetaName('twitter:card', 'summary_large_image');
+  }, [article]);
+
+  const handleShare = async () => {
+    if (!article) return;
+    const pageUrl = `${window.location.origin}/news/${article.slug}`;
+    const title = article.title;
+    const text = `Read this article on Prajatantr Ki Gunj: ${title}`;
+
+    setShareLoading(true);
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text, url: pageUrl });
+        setShareMessage('Link shared successfully.');
+      } else {
+        await navigator.clipboard.writeText(pageUrl);
+        setShareMessage('Article link copied to clipboard. Paste it where you want to share.');
+      }
+    } catch (err) {
+      setShareMessage('Unable to share right now. Please copy the link manually.');
+    } finally {
+      setShareLoading(false);
+      window.setTimeout(() => setShareMessage(''), 4000);
+    }
+  };
 
   if (error) return (
     <div className="container mx-auto px-4 py-20 text-center">
@@ -99,6 +170,18 @@ export default function ArticleDetailPage() {
                 </span>
               </div>
 
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <button type="button"
+                  onClick={handleShare}
+                  disabled={shareLoading}
+                  className="inline-flex items-center gap-2 rounded-full border border-brand-600 bg-white px-4 py-2 text-sm font-semibold text-brand-600 transition hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-60">
+                  <Share2 size={16} /> Share Article
+                </button>
+                {shareMessage && (
+                  <span className="text-sm text-gray-600">{shareMessage}</span>
+                )}
+              </div>
+
               {/* Thumbnail */}
               {article.thumbnailUrl && (
                 <div className="rounded-2xl overflow-hidden mb-6 aspect-video bg-gray-100">
@@ -114,7 +197,9 @@ export default function ArticleDetailPage() {
               {/* Article body (HTML from Quill) */}
               <div
                 className="prose prose-gray max-w-none prose-headings:font-serif
-                  prose-a:text-brand-600 prose-img:rounded-xl prose-blockquote:border-brand-500"
+                  prose-a:text-brand-600 prose-img:rounded-xl prose-blockquote:border-brand-500
+                  prose-p:my-3 prose-p:first:mt-0 prose-p:last:mb-0
+                  prose-h1:mt-6 prose-h1:mb-3 prose-h2:mt-6 prose-h2:mb-3"
                 dangerouslySetInnerHTML={{ __html: article.content }}
               />
             </>
