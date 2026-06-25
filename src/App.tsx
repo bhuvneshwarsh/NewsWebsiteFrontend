@@ -6,18 +6,19 @@ import { AuthProvider } from './context/AuthContext';
 import PublicLayout from './components/layout/PublicLayout';
 import AdminLayout  from './pages/admin/AdminLayout';
 
-// Public pages (eager — fast first load)
-import Home          from './pages/public/Home';
-import CategoryPage  from './pages/public/CategoryPages';
-import ArticleDetail from './pages/public/ArticleDetail';
-import EPaperViewer  from './pages/public/EPaperViewer';
-import TeamPage      from './pages/public/TeamPage';
-import AboutUs       from './pages/public/AboutUs';
-import ContactUs     from './pages/public/ContactUs';
-import NotFound      from './pages/public/NotFound';
-import Login         from './pages/Login';
+// Public pages
+import Home            from './pages/public/Home';
+import CategoryPage    from './pages/public/CategoryPages';
+import ArticleDetail   from './pages/public/ArticleDetail';
+import EPaperViewer    from './pages/public/EPaperViewer';
+import TeamPage        from './pages/public/TeamPage';
+import EmployeeProfile from './pages/public/EmployeeProfile';  // ← NEW
+import AboutUs         from './pages/public/AboutUs';
+import ContactUs       from './pages/public/ContactUs';
+import NotFound        from './pages/public/NotFound';
+import Login           from './pages/Login';
 
-// Admin pages (lazy — only loaded when admin visits)
+// Admin pages (lazy loaded)
 const Dashboard     = lazy(() => import('./pages/admin/Dashboard'));
 const ArticleList   = lazy(() => import('./pages/admin/ArticleList'));
 const ArticleEditor = lazy(() => import('./pages/admin/ArticleEditor'));
@@ -39,7 +40,8 @@ export default function App() {
       <BrowserRouter>
         <Suspense fallback={<Spinner />}>
           <Routes>
-            {/* ── Public routes ───────────────────────────────────────────── */}
+
+            {/* ── Public routes (inside Navbar + Footer layout) ────────────── */}
             <Route element={<PublicLayout />}>
               <Route path="/"               element={<Home />} />
               <Route path="/category/:slug" element={<CategoryPage />} />
@@ -51,10 +53,14 @@ export default function App() {
               <Route path="*"              element={<NotFound />} />
             </Route>
 
+            {/* ── Employee profile — standalone (no navbar/footer) ─────────── */}
+            {/* This is the QR scan target page — full screen branded ID card  */}
+            <Route path="/team/:employeeId" element={<EmployeeProfile />} />
+
             {/* ── Auth ────────────────────────────────────────────────────── */}
             <Route path="/login" element={<Login />} />
 
-            {/* ── Admin routes (protected inside AdminLayout) ─────────────── */}
+            {/* ── Admin routes (protected) ─────────────────────────────────── */}
             <Route path="/admin" element={<AdminLayout />}>
               <Route index             element={<Dashboard />} />
               <Route path="articles"   element={<ArticleList />} />
@@ -64,6 +70,7 @@ export default function App() {
               <Route path="epaper"     element={<EPaperAdmin />} />
               <Route path="team"       element={<TeamManager />} />
             </Route>
+
           </Routes>
         </Suspense>
       </BrowserRouter>

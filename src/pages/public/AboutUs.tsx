@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Newspaper, Target, Eye, Heart } from 'lucide-react';
+import qrImage from '/PRGI_QR.png';
 
 export default function AboutUs() {
   return (
@@ -8,7 +9,7 @@ export default function AboutUs() {
 
       <div>
         <div className="text-center mb-12">
-          <img src="../public/PRGI_QR.png" alt="PRGI QR Image" className="mx-auto w-40 h-40 mb-4" />
+          <img src={qrImage} alt="PRGI QR Image" className="mx-auto w-40 h-40 mb-4" />
         </div>
       </div>
 
