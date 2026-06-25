@@ -8,7 +8,7 @@ export default function AboutUs() {
 
       <div>
         <div className="text-center mb-12">
-          <img src="../public/PRGI_QR.png" alt="Prajatantr Ki Gunj Logo" className="mx-auto w-40 h-40 mb-4" />
+          <img src="../public/PRGI_QR.png" alt="PRGI QR Image" className="mx-auto w-40 h-40 mb-4" />
         </div>
       </div>
 
