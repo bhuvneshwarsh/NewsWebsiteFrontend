@@ -6,20 +6,24 @@ import { AuthProvider } from './context/AuthContext';
 import PublicLayout from './components/layout/PublicLayout';
 import AdminLayout  from './pages/admin/AdminLayout';
 
-// Public pages
-import Home            from './pages/public/Home';
-import CategoryPage    from './pages/public/CategoryPages';
-import ArticleDetail   from './pages/public/ArticleDetail';
-import EPaperViewer    from './pages/public/EPaperViewer';
-import NotFound        from './pages/public/NotFound';
-import Login           from './pages/Login';
+// Public pages (eager — fast first load)
+import Home          from './pages/public/Home';
+import CategoryPage  from './pages/public/CategoryPages';
+import ArticleDetail from './pages/public/ArticleDetail';
+import EPaperViewer  from './pages/public/EPaperViewer';
+import TeamPage      from './pages/public/TeamPage';
+import AboutUs       from './pages/public/AboutUs';
+import ContactUs     from './pages/public/ContactUs';
+import NotFound      from './pages/public/NotFound';
+import Login         from './pages/Login';
 
-// Admin pages (lazy loaded — only downloaded when admin visits)
+// Admin pages (lazy — only loaded when admin visits)
 const Dashboard     = lazy(() => import('./pages/admin/Dashboard'));
 const ArticleList   = lazy(() => import('./pages/admin/ArticleList'));
 const ArticleEditor = lazy(() => import('./pages/admin/ArticleEditor'));
 const MediaManager  = lazy(() => import('./pages/admin/MediaManager'));
 const EPaperAdmin   = lazy(() => import('./pages/admin/EPaperAdmin'));
+const TeamManager   = lazy(() => import('./pages/admin/TeamManager'));
 
 function Spinner() {
   return (
@@ -35,26 +39,30 @@ export default function App() {
       <BrowserRouter>
         <Suspense fallback={<Spinner />}>
           <Routes>
-            {/* ── Public routes ──────────────────────────────────────────── */}
+            {/* ── Public routes ───────────────────────────────────────────── */}
             <Route element={<PublicLayout />}>
-              <Route path="/"                 element={<Home />} />
-              <Route path="/category/:slug"   element={<CategoryPage />} />
-              <Route path="/news/:slug"       element={<ArticleDetail />} />
-              <Route path="/epaper"           element={<EPaperViewer />} />
-              <Route path="*"                 element={<NotFound />} />
+              <Route path="/"               element={<Home />} />
+              <Route path="/category/:slug" element={<CategoryPage />} />
+              <Route path="/news/:slug"     element={<ArticleDetail />} />
+              <Route path="/epaper"         element={<EPaperViewer />} />
+              <Route path="/team"           element={<TeamPage />} />
+              <Route path="/about"          element={<AboutUs />} />
+              <Route path="/contact"        element={<ContactUs />} />
+              <Route path="*"              element={<NotFound />} />
             </Route>
 
-            {/* ── Auth ───────────────────────────────────────────────────── */}
+            {/* ── Auth ────────────────────────────────────────────────────── */}
             <Route path="/login" element={<Login />} />
 
-            {/* ── Admin routes (protected) ───────────────────────────────── */}
+            {/* ── Admin routes (protected inside AdminLayout) ─────────────── */}
             <Route path="/admin" element={<AdminLayout />}>
-              <Route index              element={<Dashboard />} />
-              <Route path="articles"    element={<ArticleList />} />
-              <Route path="editor"      element={<ArticleEditor />} />
-              <Route path="editor/:id"  element={<ArticleEditor />} />
-              <Route path="media"       element={<MediaManager />} />
-              <Route path="epaper"      element={<EPaperAdmin />} />
+              <Route index             element={<Dashboard />} />
+              <Route path="articles"   element={<ArticleList />} />
+              <Route path="editor"     element={<ArticleEditor />} />
+              <Route path="editor/:id" element={<ArticleEditor />} />
+              <Route path="media"      element={<MediaManager />} />
+              <Route path="epaper"     element={<EPaperAdmin />} />
+              <Route path="team"       element={<TeamManager />} />
             </Route>
           </Routes>
         </Suspense>
