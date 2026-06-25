@@ -5,10 +5,17 @@ export default function AboutUs() {
   return (
     <div className="container mx-auto px-4 py-10 max-w-4xl">
 
+
+      <div>
+        <div className="text-center mb-12">
+          <img src="../public/PRGI_QR.png" alt="Prajatantr Ki Gunj Logo" className="mx-auto w-40 h-40 mb-4" />
+        </div>
+      </div>
+
       {/* Hero */}
       <div className="text-center mb-12">
         <h1 className="font-serif text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-          About <span className="text-brand-600">Prajatantr Ki Gunj</span>
+          About <span className="text-brand-600">प्रजातंत्र की गूंज</span>
         </h1>
         <p className="text-gray-500 max-w-2xl mx-auto leading-relaxed">
           A trusted voice for the people — delivering honest, accurate, and timely news
