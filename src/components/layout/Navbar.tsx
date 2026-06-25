@@ -5,7 +5,7 @@ import { categoriesApi, articlesApi } from '../../services/api';
 import type { Category } from '../../types';
 
 // How many categories to show directly in the navbar before overflow → "More"
-const MAX_VISIBLE_CATS = 5;
+const MAX_VISIBLE_CATS = 4;
 
 export default function Navbar() {
   const [categories,  setCategories]  = useState<Category[]>([]);
