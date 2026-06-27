@@ -45,7 +45,7 @@ export default function EmployeeArticleEditor() {
       articlesApi.list({ all: true, size: 100 }).then(r => {
         const found = r.data.data.items.find((a: any) => a.id === parseInt(id));
         if (found) {
-          setTitle(found.title);
+          setTitle(found.title);   
           setThumbnailUrl(found.thumbnailUrl ?? '');
           setCategoryId(found.categoryId ?? 0);
           articlesApi.getBySlug(found.slug).then(d => setContent(d.data.data.content));

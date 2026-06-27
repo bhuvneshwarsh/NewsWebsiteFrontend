@@ -14,6 +14,7 @@ export interface ArticleListItem {
   slug:         string;
   thumbnailUrl: string | null;
   categoryName: string;
+  categoryId:   number;
   authorName:   string;
   isPublished:  boolean;
   views:        number;
