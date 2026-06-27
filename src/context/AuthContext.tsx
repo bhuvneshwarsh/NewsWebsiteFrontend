@@ -1,25 +1,37 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { AuthUser } from '../types';
+
+export interface AuthUser {
+  token:              string;
+  fullName:           string;
+  email:              string;
+  role:               string;
+  expiry:             string;
+  // Employee-specific (only set when role === 'Employee')
+  employeeId?:        string;
+  designation?:       string;
+  imageUrl?:          string;
+  mustChangePassword?: boolean;
+}
 
 interface AuthContextValue {
-  user:    AuthUser | null;
-  login:   (user: AuthUser) => void;
-  logout:  () => void;
-  isAdmin: boolean;
+  user:       AuthUser | null;
+  login:      (user: AuthUser) => void;
+  logout:     () => void;
+  isAdmin:    boolean;
+  isEmployee: boolean;
+  isSuperAdmin: boolean;
+  updateUser: (partial: Partial<AuthUser>) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-
 const STORAGE_KEY = 'cloudnews_auth';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      return null;
-    }
+      const s = localStorage.getItem(STORAGE_KEY);
+      return s ? JSON.parse(s) : null;
+    } catch { return null; }
   });
 
   // Auto-logout when token expires
@@ -27,8 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!user) return;
     const ms = new Date(user.expiry).getTime() - Date.now();
     if (ms <= 0) { logout(); return; }
-    const timer = setTimeout(logout, ms);
-    return () => clearTimeout(timer);
+    const t = setTimeout(logout, ms);
+    return () => clearTimeout(t);
   }, [user]);
 
   const login = (u: AuthUser) => {
@@ -41,10 +53,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(STORAGE_KEY);
   };
 
-  const isAdmin = user?.role === 'SuperAdmin' || user?.role === 'Admin';
+  const updateUser = (partial: Partial<AuthUser>) => {
+    if (!user) return;
+    const updated = { ...user, ...partial };
+    setUser(updated);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  };
+
+  const isSuperAdmin = user?.role === 'SuperAdmin';
+  const isAdmin      = isSuperAdmin || user?.role === 'Admin';
+  const isEmployee   = user?.role === 'Employee';
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAdmin }}>
+    <AuthContext.Provider value={{ user, login, logout, isAdmin, isEmployee, isSuperAdmin, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

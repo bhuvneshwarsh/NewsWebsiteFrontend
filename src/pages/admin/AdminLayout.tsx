@@ -1,4 +1,4 @@
-import { Navigate, Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Link, Navigate, Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard, FileText, Image, Newspaper, LogOut, Users
@@ -29,6 +29,9 @@ export default function AdminLayout() {
         <div className="px-5 py-5 border-b border-gray-700">
           <h1 className="font-serif text-lg font-bold text-white">Prajatantr Ki Gunj</h1>
           <p className="text-xs text-gray-400 mt-0.5">Admin Panel</p>
+           <Link to="/" className="font-serif text-xl font-bold text-white-900 tracking-tight shrink-0">
+                    Home <span className="text-brand-600">Page</span>
+           </Link>
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">

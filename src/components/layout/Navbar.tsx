@@ -134,18 +134,23 @@ export default function Navbar() {
               className={({ isActive }) =>
                 `flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm font-medium transition
                 ${isActive ? 'text-brand-600' : 'text-gray-600 hover:text-brand-600'}`}>
-              <Info size={14} /> About Us
+              <Info size={14} /> About us
             </NavLink>
             <NavLink to="/contact"
               className={({ isActive }) =>
                 `flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-sm font-medium transition
                 ${isActive ? 'text-brand-600' : 'text-gray-600 hover:text-brand-600'}`}>
-              <Phone size={14} /> Contact
+              <Phone size={14} /> Contact us
             </NavLink>
             <button onClick={() => setSearchOpen(s => !s)}
               className="p-2 text-gray-500 hover:text-brand-600 transition rounded-md">
               <Search size={18} />
             </button>
+            <Link to="/employee-login"
+              className="flex items-center gap-1.5 text-xs bg-brand-600 hover:bg-brand-700
+              text-white px-3 py-1.5 rounded-md font-medium transition ml-1">
+              Staff Login
+            </Link>
             <Link to="/admin"
               className="flex items-center gap-1.5 text-xs bg-brand-600 hover:bg-brand-700
               text-white px-3 py-1.5 rounded-md font-medium transition ml-1">
@@ -221,16 +226,21 @@ export default function Navbar() {
             </Link>
             <Link to="/about"   onClick={() => setMenuOpen(false)}
               className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
-              <Info size={14} /> About Us
+              <Info size={14} /> About us
             </Link>
             <Link to="/contact" onClick={() => setMenuOpen(false)}
               className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg">
-              <Phone size={14} /> Contact Us
+              <Phone size={14} /> Contact us
+            </Link>
+            <Link to="/Employee-Login"   onClick={() => setMenuOpen(false)}
+              className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-brand-600
+                hover:bg-brand-50 rounded-lg">
+              Staff Login
             </Link>
             <Link to="/admin"   onClick={() => setMenuOpen(false)}
               className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-brand-600
                 hover:bg-brand-50 rounded-lg">
-              Admin Panel
+              Super Admin
             </Link>
           </div>
         </div>

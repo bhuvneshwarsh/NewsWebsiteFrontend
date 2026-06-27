@@ -1,4 +1,4 @@
-// ── Add these to your existing src/types/index.ts ────────────────────────────
+// ── Add these to your existing src/types/employee.ts (or replace the file) ───
 
 export interface EmployeeCard {
   id:          number;
@@ -10,30 +10,31 @@ export interface EmployeeCard {
 
 export interface EmployeeDetail extends EmployeeCard {
   email:     string | null;
-  validUpto: string | null;   // "YYYY-MM-DD"
+  validUpto: string | null;
 }
 
 export interface EmployeeAdmin extends EmployeeDetail {
-  mobile:       string | null;
-  address:      string | null;
-  dateOfBirth:  string | null;
-  govtIdType:   string | null;
-  govtIdNumber: string | null;
-  isActive:     boolean;
-  displayOrder: number;
-  createdAt:    string;
+  mobile:          string | null;
+  address:         string | null;
+  dateOfBirth:     string | null;
+  govtIdType:      string | null;
+  govtIdNumber:    string | null;
+  isActive:        boolean;
+  hasLoginAccess:  boolean;   // ← NEW
+  displayOrder:    number;
+  createdAt:       string;
 }
 
 export interface CreateEmployeePayload {
-  fullName:     string;
-  designation:  string;
-  email?:       string;
-  mobile?:      string;
-  address?:     string;
-  dateOfBirth?: string;
-  validUpto?:   string;
-  govtIdType?:  string;
-  govtIdNumber?:string;
-  imageUrl?:    string;
+  fullName:      string;
+  designation:   string;
+  email?:        string;
+  mobile?:       string;
+  address?:      string;
+  dateOfBirth?:  string;
+  validUpto?:    string;
+  govtIdType?:   string;
+  govtIdNumber?: string;
+  imageUrl?:     string;
   displayOrder?: number;
 }

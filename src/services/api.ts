@@ -99,4 +99,48 @@ export const adminApi = {
   stats: () => api.get<ApiResponse<AdminStats>>('/admin/stats'),
 };
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INSTRUCTIONS: Paste everything below into your existing src/services/api.ts
+// Add it after the existing employeesApi block (or create it if missing).
+// The `api` variable must already be defined above these additions.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Employee Login / Access management ───────────────────────────────────────
+export const employeeAccessApi = {
+
+  // SuperAdmin: grant login access (or reset password if already granted)
+  grantLogin: (employeeId: number, loginEmail?: string) =>
+    api.post<ApiResponse<{
+      employeeId:   string;
+      fullName:     string;
+      loginEmail:   string;
+      tempPassword: string;
+      message:      string;
+    }>>(`/employees/${employeeId}/grant-login`, loginEmail ? { loginEmail } : {}),
+
+  // SuperAdmin: revoke login access completely
+  revokeLogin: (employeeId: number) =>
+    api.delete<ApiResponse<{ id: number }>>(`/employees/${employeeId}/revoke-login`),
+
+  // Employee: login with EmployeeId + password
+  employeeLogin: (employeeId: string, password: string) =>
+    api.post<ApiResponse<{
+      token:              string;
+      fullName:           string;
+      email:              string;
+      role:               string;
+      employeeId:         string;
+      designation:        string;
+      imageUrl:           string | null;
+      mustChangePassword: boolean;
+      expiry:             string;
+    }>>('/auth/employee-login', { employeeId, password }),
+
+  // Any logged-in user: change password
+  changePassword: (currentPassword: string, newPassword: string) =>
+    api.post<ApiResponse<{}>>('/auth/change-password', { currentPassword, newPassword }),
+};
+
+
 export default api;
