@@ -1,19 +1,27 @@
-import { Navigate, Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Navigate, Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { FileText, LogOut, User, KeyRound, PenSquare } from 'lucide-react';
 
 export default function EmployeeLayout() {
   const { user, logout, isEmployee } = useAuth();
-  const navigate = useNavigate();
+  const navigate  = useNavigate();
+  const location  = useLocation();
 
   // Not logged in → go to employee login
   if (!user) return <Navigate to="/employee-login" replace />;
 
-  // If somehow a non-employee ends up here, redirect to admin
+  // If a non-employee ends up here, redirect to admin
   if (!isEmployee) return <Navigate to="/admin" replace />;
 
-  // Must change password → force redirect
-  if (user.mustChangePassword) return <Navigate to="/employee/change-password" replace />;
+  // ── FIXED: mustChangePassword redirect ────────────────────────────────────
+  // Only redirect if NOT already on the change-password page.
+  // Previously this caused an infinite redirect loop because:
+  //   EmployeeLayout rendered → saw mustChangePassword → redirected to /employee/change-password
+  //   → EmployeeLayout rendered again → saw mustChangePassword → redirected again → blank page
+  const isOnChangePassword = location.pathname === '/employee/change-password';
+  if (user.mustChangePassword && !isOnChangePassword) {
+    return <Navigate to="/employee/change-password" replace />;
+  }
 
   const handleLogout = () => { logout(); navigate('/employee-login'); };
 
@@ -37,7 +45,8 @@ export default function EmployeeLayout() {
             <img src={user.imageUrl} alt={user.fullName}
               className="w-9 h-9 rounded-full object-cover border-2 border-brand-500 shrink-0" />
           ) : (
-            <div className="w-9 h-9 rounded-full bg-brand-600 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-full bg-brand-600 flex items-center
+              justify-center shrink-0">
               <User size={16} className="text-white" />
             </div>
           )}
@@ -48,25 +57,45 @@ export default function EmployeeLayout() {
           </div>
         </div>
 
+        {/* mustChangePassword warning banner */}
+        {user.mustChangePassword && (
+          <div className="mx-3 mb-2 bg-amber-900/40 border border-amber-700/50
+            rounded-xl px-3 py-2.5">
+            <p className="text-xs text-amber-300 font-medium leading-snug">
+              ⚠️ Please change your temporary password to continue.
+            </p>
+          </div>
+        )}
+
         {/* Nav */}
         <nav className="flex-1 px-3 py-3 space-y-1">
-          <NavLink to="/employee/dashboard"
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition
-              ${isActive ? 'bg-brand-600 text-white' : 'text-gray-300 hover:bg-gray-800'}`}>
-            <FileText size={16} /> My Articles
-          </NavLink>
-          <NavLink to="/employee/editor"
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition
-              ${isActive ? 'bg-brand-600 text-white' : 'text-gray-300 hover:bg-gray-800'}`}>
-            <PenSquare size={16} /> Write Article
-          </NavLink>
+          {/* Disable other nav items until password is changed */}
+          {!user.mustChangePassword && (
+            <>
+              <NavLink to="/employee/dashboard"
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition
+                  ${isActive ? 'bg-brand-600 text-white' : 'text-gray-300 hover:bg-gray-800'}`}>
+                <FileText size={16} /> My Articles
+              </NavLink>
+              <NavLink to="/employee/editor"
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition
+                  ${isActive ? 'bg-brand-600 text-white' : 'text-gray-300 hover:bg-gray-800'}`}>
+                <PenSquare size={16} /> Write Article
+              </NavLink>
+            </>
+          )}
           <NavLink to="/employee/change-password"
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition
-              ${isActive ? 'bg-brand-600 text-white' : 'text-gray-300 hover:bg-gray-800'}`}>
-            <KeyRound size={16} /> Change Password
+              ${isActive
+                ? 'bg-brand-600 text-white'
+                : user.mustChangePassword
+                  ? 'text-amber-300 hover:bg-gray-800'
+                  : 'text-gray-300 hover:bg-gray-800'}`}>
+            <KeyRound size={16} />
+            {user.mustChangePassword ? 'Set New Password ⚠️' : 'Change Password'}
           </NavLink>
         </nav>
 
@@ -79,7 +108,7 @@ export default function EmployeeLayout() {
         </div>
       </aside>
 
-      {/* Main */}
+      {/* Main content */}
       <main className="flex-1 overflow-y-auto">
         <Outlet />
       </main>
