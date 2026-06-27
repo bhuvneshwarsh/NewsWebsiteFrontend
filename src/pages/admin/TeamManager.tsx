@@ -175,7 +175,7 @@ function EmployeeFormModal({ existing, onClose, onSaved }: {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="Full Name *"    value={form.fullName}      onChange={v => set('fullName', v)}       placeholder="Rajesh Kumar" />
+            <Field label="Full Name *"    value={form.fullName}      onChange={v => set('fullName', v)}       placeholder="Bhuvneshwar Sharma" />
             <Field label="Designation *"  value={form.designation}   onChange={v => set('designation', v)}    placeholder="Senior Reporter" />
             <Field label="Email"          value={form.email ?? ''}   onChange={v => set('email', v)}          placeholder="emp@email.com" type="email" />
             <Field label="Mobile"         value={form.mobile ?? ''}  onChange={v => set('mobile', v)}         placeholder="+91 XXXXX XXXXX" />

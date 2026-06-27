@@ -26,10 +26,11 @@ import EmployeeLogin from './pages/EmployeeLogin';
 import EmployeeDashboard     from './pages/employee/EmployeeDashboard';
 import EmployeeArticleEditor from './pages/employee/EmployeeArticleEditor';
 import ChangePassword        from './pages/employee/ChangePassword';
+import EmployeeGuide         from './pages/employee/EmployeeGuide';  // ← NEW
 
 // Admin pages (lazy)
-const Dashboard   = lazy(() => import('./pages/admin/Dashboard'));
-const ArticleList = lazy(() => import('./pages/admin/ArticleList'));
+const Dashboard     = lazy(() => import('./pages/admin/Dashboard'));
+const ArticleList   = lazy(() => import('./pages/admin/ArticleList'));
 const ArticleEditor = lazy(() => import('./pages/admin/ArticleEditor'));
 const MediaManager  = lazy(() => import('./pages/admin/MediaManager'));
 const EPaperAdmin   = lazy(() => import('./pages/admin/EPaperAdmin'));
@@ -38,7 +39,8 @@ const TeamManager   = lazy(() => import('./pages/admin/TeamManager'));
 function Spinner() {
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin" />
+      <div className="w-8 h-8 border-4 border-brand-200 border-t-brand-600
+        rounded-full animate-spin" />
     </div>
   );
 }
@@ -50,7 +52,7 @@ export default function App() {
         <Suspense fallback={<Spinner />}>
           <Routes>
 
-            {/* ── Public routes ──────────────────────────────────────────── */}
+            {/* ── Public routes (with Navbar + Footer) ────────────────────── */}
             <Route element={<PublicLayout />}>
               <Route path="/"               element={<Home />} />
               <Route path="/category/:slug" element={<CategoryPage />} />
@@ -59,26 +61,28 @@ export default function App() {
               <Route path="/team"           element={<TeamPage />} />
               <Route path="/about"          element={<AboutUs />} />
               <Route path="/contact"        element={<ContactUs />} />
+              {/* ── NEW: Employee guide — public, accessible without login ── */}
+              <Route path="/employee-guide" element={<EmployeeGuide />} />
               <Route path="*"               element={<NotFound />} />
             </Route>
 
-            {/* ── Employee profile (standalone — QR scan target) ──────────── */}
+            {/* ── Employee QR profile (standalone — no navbar) ────────────── */}
             <Route path="/team/:employeeId" element={<EmployeeProfile />} />
 
-            {/* ── Auth ───────────────────────────────────────────────────── */}
+            {/* ── Auth ────────────────────────────────────────────────────── */}
             <Route path="/login"          element={<Login />} />
             <Route path="/employee-login" element={<EmployeeLogin />} />
 
-            {/* ── Employee portal (restricted) ────────────────────────────── */}
+            {/* ── Employee portal (restricted) ─────────────────────────────── */}
             <Route path="/employee" element={<EmployeeLayout />}>
-              <Route index                    element={<Navigate to="/employee/dashboard" replace />} />
-              <Route path="dashboard"         element={<EmployeeDashboard />} />
-              <Route path="editor"            element={<EmployeeArticleEditor />} />
-              <Route path="editor/:id"        element={<EmployeeArticleEditor />} />
-              <Route path="change-password"   element={<ChangePassword />} />
+              <Route index                  element={<Navigate to="/employee/dashboard" replace />} />
+              <Route path="dashboard"       element={<EmployeeDashboard />} />
+              <Route path="editor"          element={<EmployeeArticleEditor />} />
+              <Route path="editor/:id"      element={<EmployeeArticleEditor />} />
+              <Route path="change-password" element={<ChangePassword />} />
             </Route>
 
-            {/* ── Admin routes (SuperAdmin / Admin / Reporter) ─────────────── */}
+            {/* ── Admin routes ─────────────────────────────────────────────── */}
             <Route path="/admin" element={<AdminLayout />}>
               <Route index             element={<Dashboard />} />
               <Route path="articles"   element={<ArticleList />} />
