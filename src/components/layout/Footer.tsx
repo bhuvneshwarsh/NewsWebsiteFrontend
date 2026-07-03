@@ -2,6 +2,9 @@ import { Link } from 'react-router-dom';
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const formattedDate = new Date().toLocaleDateString('en-IN', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
 
   return (
     <footer className="bg-gray-900 text-gray-400 mt-16">
@@ -87,12 +90,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-gray-800 pt-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-            <p className="text-xs text-center">
-              © {year} Prajatantr Ki Gunj. All rights reserved.
-            </p>
-            <div className="flex items-center gap-4 text-xs">
+         <div className="border-t border-gray-800 pt-6 flex text-center items-center gap-4 text-xs">
               <Link to="/privacy-policy"
                 className="hover:text-white transition">Privacy Policy</Link>
               <span className="text-gray-700">|</span>
@@ -101,10 +99,18 @@ export default function Footer() {
               <span className="text-gray-700">|</span>
               <Link to="/contact"
                 className="hover:text-white transition">Contact</Link>
+         </div>
+        {/* Bottom bar */}
+        <div className="border-t border-gray-800 pt-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-3">
+            <div className="text-xs text-center">
+              <div>{formattedDate}</div>
+          <div >© {year} Prajatantr Ki Gunj | Developed and Maintained by Bhuvneshwar Sharma (Senior Software Engineer - Full Stack Web Developer).</div>
             </div>
+        </div>
+           
           </div>
         </div>
-      </div>
     </footer>
   );
 }
