@@ -78,7 +78,7 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link to="/" className="font-serif text-xl font-bold text-gray-900 tracking-tight shrink-0">
-            Prajatantr <span className="text-brand-600">Ki Gunj</span>
+              प्रजातंत्र <span className="text-brand-600">की गूंज</span>
           </Link>
 
           {/* Desktop nav */}

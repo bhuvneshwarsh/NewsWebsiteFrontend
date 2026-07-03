@@ -1,16 +1,18 @@
-import { Link, Navigate, Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Navigate, Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
-  LayoutDashboard, FileText, Image, Newspaper, LogOut, Users
+  LayoutDashboard, FileText, Image,
+  Newspaper, LogOut, Users, Megaphone
 } from 'lucide-react';
 
 const navItems = [
-  { to: '/admin',          label: 'Dashboard',    icon: LayoutDashboard, end: true },
-  { to: '/admin/articles', label: 'Articles',     icon: FileText  },
-  { to: '/admin/editor',   label: 'New Article',  icon: FileText  },
-  { to: '/admin/media',    label: 'Media',        icon: Image     },
-  { to: '/admin/epaper',   label: 'E-Paper',      icon: Newspaper },
-  { to: '/admin/team',     label: 'Team Manager', icon: Users     },
+  { to: '/admin',            label: 'Dashboard',       icon: LayoutDashboard, end: true },
+  { to: '/admin/articles',   label: 'Articles',        icon: FileText  },
+  { to: '/admin/editor',     label: 'New Article',     icon: FileText  },
+  { to: '/admin/media',      label: 'Media',           icon: Image     },
+  { to: '/admin/epaper',     label: 'E-Paper',         icon: Newspaper },
+  { to: '/admin/team',       label: 'Team Manager',    icon: Users     },
+  { to: '/admin/ads',        label: 'Advertisements',  icon: Megaphone },  // ← NEW
 ];
 
 export default function AdminLayout() {
@@ -24,14 +26,12 @@ export default function AdminLayout() {
 
   return (
     <div className="flex h-screen bg-gray-100 font-sans">
+
       {/* Sidebar */}
       <aside className="w-60 bg-gray-900 text-white flex flex-col shrink-0">
         <div className="px-5 py-5 border-b border-gray-700">
           <h1 className="font-serif text-lg font-bold text-white">Prajatantr Ki Gunj</h1>
           <p className="text-xs text-gray-400 mt-0.5">Admin Panel</p>
-           <Link to="/" className="font-serif text-xl font-bold text-white-900 tracking-tight shrink-0">
-                    Home <span className="text-brand-600">Page</span>
-           </Link>
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
@@ -60,7 +60,7 @@ export default function AdminLayout() {
         </div>
       </aside>
 
-      {/* Main content */}
+      {/* Main */}
       <main className="flex-1 overflow-y-auto">
         <Outlet />
       </main>
