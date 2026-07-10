@@ -45,6 +45,9 @@ export const articlesApi = {
 
   delete: (id: number) =>
     api.delete<ApiResponse<{ id: number }>>(`/articles/${id}`),
+
+  trackView: (slug: string) =>
+    api.post<ApiResponse<{ success: boolean }>>(`/articles/${slug}/view`),
 };
 
 // ── Categories ────────────────────────────────────────────────────────────────
