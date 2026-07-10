@@ -7,7 +7,7 @@ import {
 import { categoriesApi, articlesApi } from '../../services/api';
 import type { Category } from '../../types';
 
-const MAX_VISIBLE_CATS = 5;
+const MAX_VISIBLE_CATS = 4;
 
 export default function Navbar() {
   const [categories,  setCategories]  = useState<Category[]>([]);
@@ -20,10 +20,25 @@ export default function Navbar() {
   const moreRef  = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    categoriesApi.list().then(r => setCategories(r.data.data));
-    articlesApi.list({ size: 8 }).then(r =>
-      setTickerItems(r.data.data.items.map((a: any) => a.title))
-    );
+    categoriesApi.list()
+      .then(r => {
+        const payload = Array.isArray(r?.data?.data)
+          ? r.data.data
+          : Array.isArray(r?.data)
+            ? r.data
+            : [];
+        setCategories(payload);
+      })
+      .catch(() => setCategories([]));
+
+    articlesApi.list({ size: 8 })
+      .then(r => {
+        const items = Array.isArray(r?.data?.data?.items)
+          ? r.data.data.items
+          : [];
+        setTickerItems(items.map((a: any) => a.title).filter(Boolean));
+      })
+      .catch(() => setTickerItems([]));
   }, []);
 
   useEffect(() => {
@@ -82,7 +97,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden lg:flex items-center gap-0.5 flex-1 overflow-hidden">
+          <nav className="hidden lg:flex items-center gap-0.5 flex-1 overflow-visible">
             <NavLink to="/" end className={navLinkClass}>Home</NavLink>
 
             {visibleCats.map(cat => (
@@ -93,7 +108,7 @@ export default function Navbar() {
 
             {/* More dropdown */}
             {overflowCats.length > 0 && (
-              <div ref={moreRef} className="relative">
+              <div ref={moreRef} className="relative z-50">
                 <button
                   onClick={() => setMoreOpen(o => !o)}
                   className={`flex items-center gap-1 px-2.5 py-1.5 rounded-md text-sm

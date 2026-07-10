@@ -90,27 +90,32 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-         <div className="border-t border-gray-800 pt-6 flex text-center items-center gap-4 text-xs">
-              <Link to="/privacy-policy"
-                className="hover:text-white transition">Privacy Policy</Link>
-              <span className="text-gray-700">|</span>
-              <Link to="/terms"
-                className="hover:text-white transition">Terms & Conditions</Link>
-              <span className="text-gray-700">|</span>
-              <Link to="/contact"
-                className="hover:text-white transition">Contact</Link>
-         </div>
-        {/* Bottom bar */}
         <div className="border-t border-gray-800 pt-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-            <div className="text-xs text-center">
-              <div>{formattedDate}</div>
-          <div >© {year} Prajatantr Ki Gunj | Developed and Maintained by Bhuvneshwar Sharma (Senior Software Engineer - Full Stack Web Developer).</div>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-center md:text-left">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-gray-400">
+              <Link to="/privacy-policy" className="hover:text-white transition">
+                Privacy Policy
+              </Link>
+              <span className="text-gray-700">|</span>
+              <Link to="/terms" className="hover:text-white transition">
+                Terms & Conditions
+              </Link>
+              <span className="text-gray-700">|</span>
+              <Link to="/contact" className="hover:text-white transition">
+                Contact
+              </Link>
             </div>
-        </div>
-           
+
+            <div className="text-gray-500 leading-relaxed">
+              <div>{formattedDate}</div>
+              <div>
+                © {year} Prajatantr Ki Gunj | Developed and Maintained by Bhuvneshwar Sharma
+                (Senior Software Engineer - Full Stack Web Developer).
+              </div>
+            </div>
           </div>
         </div>
+      </div>
     </footer>
   );
 }
