@@ -4,6 +4,8 @@ import { articlesApi } from '../../services/api';
 import type { ArticleDetail } from '../../types';
 import { SkeletonText } from '../../components/ui/Skeleton';
 import AdSlot from '../../components/ui/AdSlot';
+import ShareButton from '../../components/ui/ShareButton';
+import { useMetaTags } from '../../hooks/useMetaTags';
 import { Clock, Eye, User, ChevronRight, ArrowLeft } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 
@@ -24,6 +26,17 @@ export default function ArticleDetailPage() {
   const [imgError,   setImgError]   = useState(false);
   const [viewCount,  setViewCount]  = useState<number | null>(null);
   const viewTracked  = useRef(false);   // prevent double-tracking on StrictMode re-render
+
+  useMetaTags({
+    title: article?.title ?? 'Loading article',
+    description: article?.content ? article.content.replace(/<[^>]*>/g, '').slice(0, 160) : 'Latest news and updates',
+    imageUrl: article?.thumbnailUrl,
+    url: typeof window !== 'undefined' ? window.location.href : '',
+    type: 'article',
+    author: article?.authorName,
+    publishedAt: article?.publishedAt,
+    category: article?.categoryName,
+  });
 
   useEffect(() => {
     if (!slug) return;
@@ -165,6 +178,14 @@ export default function ArticleDetailPage() {
                     ? viewCount.toLocaleString()
                     : article.views.toLocaleString()} views
                 </span>
+                <div className="ml-auto">
+                  <ShareButton
+                    title={article.title}
+                    slug={article.slug}
+                    thumbnailUrl={article.thumbnailUrl}
+                    variant="button"
+                  />
+                </div>
               </div>
 
               {/* Thumbnail */}
