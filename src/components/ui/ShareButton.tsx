@@ -20,7 +20,7 @@ export default function ShareButton({
 
   // ── Native share (mobile) ─────────────────────────────────────────────────
   const handleNativeShare = async () => {
-    if (navigator.share) {
+    if (typeof navigator.share === 'function' && variant !== 'full') {
       try {
         await navigator.share({ title, url, text: title });
       } catch { /* user cancelled */ }

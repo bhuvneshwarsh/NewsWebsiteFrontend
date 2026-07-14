@@ -12,7 +12,7 @@ interface MetaTagsOptions {
 }
 
 const SITE_NAME   = 'Prajatantr Ki Gunj';
-const DEFAULT_IMG = 'https://www.prajatantrkigunj.com/logo-social.png'; // add a 1200x630 image here
+const DEFAULT_IMG = '../public/logo.png'; // add a 1200x630 image here
 
 function setMeta(property: string, content: string, useProperty = true) {
   const attr = useProperty ? 'property' : 'name';

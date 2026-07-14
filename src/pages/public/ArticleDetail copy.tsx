@@ -17,47 +17,37 @@ function isValidUrl(url: string | null | undefined): boolean {
   } catch { return false; }
 }
 
-// ── Strip HTML for meta description ──────────────────────────────────────────
-function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 160);
-}
-
 export default function ArticleDetailPage() {
-  const { slug }    = useParams<{ slug: string }>();
-  const navigate    = useNavigate();
-  const [article,   setArticle]   = useState<ArticleDetail | null>(null);
-  const [loading,   setLoading]   = useState(true);
-  const [error,     setError]     = useState('');
-  const [imgError,  setImgError]  = useState(false);
-  const [viewCount, setViewCount] = useState<number | null>(null);
-  const viewTracked = useRef(false);
+  const { slug }     = useParams<{ slug: string }>();
+  const navigate     = useNavigate();
+  const [article,    setArticle]    = useState<ArticleDetail | null>(null);
+  const [loading,    setLoading]    = useState(true);
+  const [error,      setError]      = useState('');
+  const [imgError,   setImgError]   = useState(false);
+  const [viewCount,  setViewCount]  = useState<number | null>(null);
+  const viewTracked  = useRef(false);   // prevent double-tracking on StrictMode re-render
 
-  // ── Set OG meta tags when article loads ──────────────────────────────────
-  useMetaTags(
-    article
-      ? {
-          title:       article.title,
-          description: stripHtml(article.content),
-          imageUrl:    article.thumbnailUrl,
-          url:         `${window.location.origin}/news/${article.slug}`,
-          type:        'article',
-          author:      article.authorName,
-          publishedAt: article.publishedAt,
-          category:    article.categoryName,
-        }
-      : {
-          title:       'खबर लोड हो रही है…',
-          description: 'Prajatantr Ki Gunj — आपका विश्वसनीय समाचार स्रोत',
-        }
-  );
+  useMetaTags({
+    title: article?.title ?? 'Loading article',
+    description: article?.content ? article.content.replace(/<[^>]*>/g, '').slice(0, 160) : 'Latest news and updates',
+    imageUrl: article?.thumbnailUrl,
+    url: typeof window !== 'undefined' ? window.location.href : '',
+    type: 'article',
+    author: article?.authorName,
+    publishedAt: article?.publishedAt,
+    category: article?.categoryName,
+  });
 
   useEffect(() => {
     if (!slug) return;
+
+    // Reset state when slug changes (user navigates article → article)
     setLoading(true);
     setError('');
     setImgError(false);
     setViewCount(null);
     viewTracked.current = false;
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     articlesApi.getBySlug(slug)
@@ -65,6 +55,10 @@ export default function ArticleDetailPage() {
         const data = r.data.data;
         setArticle(data);
         setViewCount(data.views);
+
+        // ── Track view immediately after article loads ─────────────────────
+        // Only track once per slug per page load (React StrictMode calls
+        // useEffect twice in dev — the ref prevents double counting)
         if (!viewTracked.current) {
           viewTracked.current = true;
           trackView(slug, data.views);
@@ -74,21 +68,36 @@ export default function ArticleDetailPage() {
       .finally(() => setLoading(false));
   }, [slug]);
 
+  // ── View tracking function ─────────────────────────────────────────────────
   const trackView = async (articleSlug: string, currentViews: number) => {
     try {
+      // Skip tracking if this article was already viewed in this browser session
+      // (prevents refresh-spamming the view count)
       const sessionKey = `viewed_${articleSlug}`;
-      if (sessionStorage.getItem(sessionKey)) return;
+      if (sessionStorage.getItem(sessionKey)) {
+        // Already viewed this session — don't increment again, but still show count
+        return;
+      }
+
+      // Call the dedicated view-tracking endpoint (POST /api/articles/{slug}/view)
       await articlesApi.trackView(articleSlug);
+
+      // Mark as viewed in this browser session
       sessionStorage.setItem(sessionKey, '1');
+
+      // Optimistically update the displayed view count immediately
       setViewCount(v => (v !== null ? v + 1 : currentViews + 1));
-    } catch { /* ignore */ }
+    } catch {
+      // Silently ignore — view tracking failure should never break the page
+    }
   };
 
   if (error) return (
     <div className="container mx-auto px-4 py-20 text-center">
       <p className="text-gray-500 mb-4">{error}</p>
       <button onClick={() => navigate(-1)}
-        className="text-brand-600 hover:underline text-sm flex items-center gap-1 mx-auto">
+        className="text-brand-600 hover:underline text-sm
+          flex items-center gap-1 mx-auto">
         <ArrowLeft size={14} /> Go back
       </button>
     </div>
@@ -100,9 +109,12 @@ export default function ArticleDetailPage() {
   return (
     <div className="container mx-auto px-4 py-6 max-w-6xl">
 
+      {/* Top banner ad */}
       <AdSlot placement="banner_top" className="mb-6" />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        {/* ── Article ──────────────────────────────────────────────────────── */}
         <article className="lg:col-span-2">
 
           {/* Breadcrumb */}
@@ -140,27 +152,32 @@ export default function ArticleDetailPage() {
                 {article.title}
               </h1>
 
-              {/* Meta row — author, date, views, SHARE BUTTON */}
-              <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500
+              {/* Meta row */}
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500
                 mb-5 pb-5 border-b border-gray-100">
                 <span className="flex items-center gap-1.5">
                   <User size={14} /> {article.authorName}
                 </span>
                 {article.publishedAt && (
-                  <span className="flex items-center gap-1.5">
-                    <Clock size={14} />
-                    {format(new Date(article.publishedAt), 'dd MMM yyyy, h:mm a')}
-                    <span className="text-gray-300">
-                      ({formatDistanceToNow(new Date(article.publishedAt), { addSuffix: true })})
+                  <>
+                    <span className="flex items-center gap-1.5">
+                      <Clock size={14} />
+                      {format(new Date(article.publishedAt), 'dd MMM yyyy, h:mm a')}
                     </span>
-                  </span>
+                    <span className="text-gray-300">
+                      ({formatDistanceToNow(
+                        new Date(article.publishedAt), { addSuffix: true }
+                      )})
+                    </span>
+                  </>
                 )}
+                {/* Show live-updated view count */}
                 <span className="flex items-center gap-1.5">
                   <Eye size={14} />
-                  {(viewCount ?? article.views).toLocaleString()} views
+                  {viewCount !== null
+                    ? viewCount.toLocaleString()
+                    : article.views.toLocaleString()} views
                 </span>
-
-                {/* ── Share button in meta row ── */}
                 <div className="ml-auto">
                   <ShareButton
                     title={article.title}
@@ -183,6 +200,7 @@ export default function ArticleDetailPage() {
                 </div>
               )}
 
+              {/* In-content ad */}
               <AdSlot placement="inline" className="mb-6" />
 
               {/* Article body */}
@@ -192,32 +210,11 @@ export default function ArticleDetailPage() {
                   prose-blockquote:border-brand-500"
                 dangerouslySetInnerHTML={{ __html: article.content }}
               />
-
-              {/* ── Bottom share section ──────────────────────────────────── */}
-              <div className="mt-8 pt-6 border-t border-gray-100">
-                <div className="bg-gray-50 rounded-2xl p-5 flex flex-col sm:flex-row
-                  items-center gap-4">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-800 text-sm">
-                      यह खबर शेयर करें
-                    </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      Share this article with your friends and family
-                    </p>
-                  </div>
-                  <ShareButton
-                    title={article.title}
-                    slug={article.slug}
-                    thumbnailUrl={article.thumbnailUrl}
-                    variant="full"
-                  />
-                </div>
-              </div>
             </>
           ) : null}
         </article>
 
-        {/* Sidebar */}
+        {/* ── Sidebar ───────────────────────────────────────────────────────── */}
         <aside className="space-y-5 lg:sticky lg:top-20 self-start">
           <AdSlot placement="sidebar" />
         </aside>
