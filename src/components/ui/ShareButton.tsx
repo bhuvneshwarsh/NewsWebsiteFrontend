@@ -16,13 +16,18 @@ export default function ShareButton({
   const [open,   setOpen]   = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const url = `${window.location.origin}/news/${slug}`;
+  // ── For social sharing, use OG endpoint that includes meta tags & image ────
+  // Social media crawlers fetch this URL, get full HTML with OG tags
+  // Real browsers get auto-redirected to the article page
+  const articleUrl = `${window.location.origin}/news/${slug}`;
+  const ogUrl      = `${window.location.origin}/api/og?slug=${encodeURIComponent(slug)}`;
 
   // ── Native share (mobile) ─────────────────────────────────────────────────
   const handleNativeShare = async () => {
     if (typeof navigator.share === 'function' && variant !== 'full') {
       try {
-        await navigator.share({ title, url, text: title });
+        // Share the OG endpoint so crawlers get proper meta tags
+        await navigator.share({ title, url: ogUrl, text: title });
       } catch { /* user cancelled */ }
       return;
     }
@@ -30,9 +35,9 @@ export default function ShareButton({
     setOpen(true);
   };
 
-  // ── Copy link ─────────────────────────────────────────────────────────────
+  // ── Copy link (user gets article URL, not OG endpoint) ───────────────────
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(url);
+    await navigator.clipboard.writeText(articleUrl);
     setCopied(true);
     setTimeout(() => { setCopied(false); setOpen(false); }, 2000);
   };
@@ -43,25 +48,25 @@ export default function ShareButton({
       label:   'WhatsApp',
       icon:    MessageCircle,
       color:   'bg-green-500 hover:bg-green-600',
-      href:    `https://api.whatsapp.com/send?text=${encodeURIComponent(title + '\n' + url)}`,
+      href:    `https://api.whatsapp.com/send?text=${encodeURIComponent(title + '\n' + ogUrl)}`,
     },
     {
       label:   'Twitter / X',
       icon:    Twitter,
       color:   'bg-sky-500 hover:bg-sky-600',
-      href:    `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`,
+      href:    `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(ogUrl)}`,
     },
     {
       label:   'Telegram',
       icon:    Share2,
       color:   'bg-blue-500 hover:bg-blue-600',
-      href:    `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`,
+      href:    `https://t.me/share/url?url=${encodeURIComponent(ogUrl)}&text=${encodeURIComponent(title)}`,
     },
     {
       label:   'Facebook',
       icon:    Share2,
       color:   'bg-blue-700 hover:bg-blue-800',
-      href:    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+      href:    `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(ogUrl)}`,
     },
   ];
 
@@ -155,7 +160,7 @@ export default function ShareButton({
                   ? <><Check size={13} /> Link Copied!</>
                   : <><Link2 size={13} /> Copy Link</>}
                 <span className="ml-auto text-gray-400 font-mono truncate max-w-[100px] text-[10px]">
-                  {url.replace('https://', '')}
+                  {articleUrl.replace('https://', '')}
                 </span>
               </button>
             </div>

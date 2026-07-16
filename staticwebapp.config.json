@@ -1,12 +1,34 @@
 {
+  "routes": [
+    {
+      "route": "/api/*",
+      "allowedRoles": ["anonymous"]
+    }
+  ],
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/images/*.{png,jpg,gif}", "/css/*", "/assets/*"]
+    "exclude": [
+      "/api/*",
+      "/images/*",
+      "/css/*",
+      "/assets/*",
+      "*.css",
+      "*.js",
+      "*.svg",
+      "*.png",
+      "*.jpg",
+      "*.ico",
+      "*.webp",
+      "*.pdf",
+      "*.woff",
+      "*.woff2"
+    ]
   },
   "mimeTypes": {
     ".js": "application/javascript",
     ".jsx": "application/javascript",
     ".ts": "application/javascript",
-    ".tsx": "application/javascript"
+    ".tsx": "application/javascript",
+    ".json": "application/json"
   }
 }
