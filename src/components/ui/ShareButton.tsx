@@ -21,12 +21,12 @@ export default function ShareButton({
   const [open,   setOpen]   = useState(false);
   const [copied, setCopied] = useState(false);
 
-  // ── For social sharing, use OG endpoint that includes meta tags & image ────
-  // Social media crawlers fetch this URL, get full HTML with OG tags
-  // Real browsers get auto-redirected to the article page
+  // ── For social sharing, use short URL format for sharing ────────────────────
+  // SWA will rewrite /s/{slug} internally to /api/og/{slug}
+  // This gives us: short URL + professional domain + OG meta tags
   const articleUrl = `${FRONTEND_URL}/news/${slug}`;
-  // Use backend API URL for OG endpoint so crawlers can access the meta tags
-  const ogUrl      = `${API_BASE_URL}/og?slug=${encodeURIComponent(slug)}`;
+  // Short URL that SWA rewrites to backend OG endpoint
+  const ogUrl      = `${FRONTEND_URL}/s/${slug}`;
 
   // ── Native share (mobile) ─────────────────────────────────────────────────
   const handleNativeShare = async () => {

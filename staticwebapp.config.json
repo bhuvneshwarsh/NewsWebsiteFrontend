@@ -3,6 +3,11 @@
     {
       "route": "/api/*",
       "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/s/*",
+      "rewrite": "/api/og/*",
+      "allowedRoles": ["anonymous"]
     }
   ],
   "navigationFallback": {
