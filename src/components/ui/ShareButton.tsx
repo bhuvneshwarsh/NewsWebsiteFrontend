@@ -3,6 +3,11 @@ import {
   Share2, Check, Copy, MessageCircle, Twitter, Link2, X
 } from 'lucide-react';
 
+// Get the backend API base URL (same as axios setup in api.ts)
+const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || '/api';
+// Get the frontend base URL (for article links)
+const FRONTEND_URL = window.location.origin;
+
 interface ShareButtonProps {
   title:       string;
   slug:        string;
@@ -19,8 +24,9 @@ export default function ShareButton({
   // ── For social sharing, use OG endpoint that includes meta tags & image ────
   // Social media crawlers fetch this URL, get full HTML with OG tags
   // Real browsers get auto-redirected to the article page
-  const articleUrl = `${window.location.origin}/news/${slug}`;
-  const ogUrl      = `${window.location.origin}/api/og?slug=${encodeURIComponent(slug)}`;
+  const articleUrl = `${FRONTEND_URL}/news/${slug}`;
+  // Use backend API URL for OG endpoint so crawlers can access the meta tags
+  const ogUrl      = `${API_BASE_URL}/og?slug=${encodeURIComponent(slug)}`;
 
   // ── Native share (mobile) ─────────────────────────────────────────────────
   const handleNativeShare = async () => {
