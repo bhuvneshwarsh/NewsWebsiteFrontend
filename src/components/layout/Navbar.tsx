@@ -74,7 +74,7 @@ export default function Navbar() {
         <div className="bg-brand-600 text-white text-xs overflow-hidden">
           <div className="container mx-auto px-4 flex items-center">
             <span className="bg-brand-800 font-bold uppercase px-3 py-1.5 shrink-0 tracking-wider">
-              Breaking
+              Breaking News
             </span>
             <div className="overflow-hidden flex-1 py-1.5 pl-3">
               <div className="ticker-track whitespace-nowrap">
@@ -92,8 +92,9 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-14 gap-2">
 
           {/* Logo */}
-          <Link to="/" className="font-serif text-xl font-bold text-gray-900 tracking-tight shrink-0">
-              प्रजातंत्र <span className="text-brand-600">की गूंज</span>
+          <Link to="/" className="text-brand-600">
+              प्रजातंत्र <span className="font-serif text-xl font-bold text-gray-900 tracking-tight shrink-0">की गूंज</span>
+              
           </Link>
 
           {/* Desktop nav */}

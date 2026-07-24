@@ -194,46 +194,13 @@ export default function AboutUs() {
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="font-serif text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-          About <span className="text-brand-600">Prajatantr Ki Gunj</span>
+          About <span className="text-brand-600">प्रजातंत्र की गूंज</span>
         </h1>
         <p className="text-gray-500 max-w-2xl mx-auto leading-relaxed">
           A trusted voice for the people — delivering honest, accurate, and timely
           news across politics, culture, sports, and beyond.
         </p>
         <div className="w-16 h-1 bg-brand-600 rounded-full mx-auto mt-5" />
-      </div>
-
-      {/* Mission / Vision / Values */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14">
-        {[
-          {
-            icon:  Target,
-            title: 'Our Mission',
-            desc:  'To deliver unbiased, fact-checked journalism that empowers citizens to make informed decisions about their communities and country.',
-            color: 'bg-blue-50 text-blue-600',
-          },
-          {
-            icon:  Eye,
-            title: 'Our Vision',
-            desc:  'A fully informed, engaged citizenry — where every person has access to reliable news regardless of their location or background.',
-            color: 'bg-green-50 text-green-600',
-          },
-          {
-            icon:  Heart,
-            title: 'Our Values',
-            desc:  'Integrity, accuracy, transparency, and community. We hold ourselves accountable to the highest standards of ethical journalism.',
-            color: 'bg-brand-50 text-brand-600',
-          },
-        ].map(({ icon: Icon, title, desc, color }) => (
-          <div key={title}
-            className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
-            <div className={`inline-flex p-3 rounded-xl ${color} mb-4`}>
-              <Icon size={22} />
-            </div>
-            <h3 className="font-semibold text-gray-800 text-lg mb-2">{title}</h3>
-            <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
-          </div>
-        ))}
       </div>
 
       {/* ── EDITOR / SAMPADAK SECTION ─────────────────────────────────────── */}
@@ -286,6 +253,41 @@ export default function AboutUs() {
           )}
         </div>
       )}
+
+      {/* Mission / Vision / Values */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14">
+        {[
+          {
+            icon:  Target,
+            title: 'Our Mission',
+            desc:  'To deliver unbiased, fact-checked journalism that empowers citizens to make informed decisions about their communities and country.',
+            color: 'bg-blue-50 text-blue-600',
+          },
+          {
+            icon:  Eye,
+            title: 'Our Vision',
+            desc:  'A fully informed, engaged citizenry — where every person has access to reliable news regardless of their location or background.',
+            color: 'bg-green-50 text-green-600',
+          },
+          {
+            icon:  Heart,
+            title: 'Our Values',
+            desc:  'Integrity, accuracy, transparency, and community. We hold ourselves accountable to the highest standards of ethical journalism.',
+            color: 'bg-brand-50 text-brand-600',
+          },
+        ].map(({ icon: Icon, title, desc, color }) => (
+          <div key={title}
+            className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+            <div className={`inline-flex p-3 rounded-xl ${color} mb-4`}>
+              <Icon size={22} />
+            </div>
+            <h3 className="font-semibold text-gray-800 text-lg mb-2">{title}</h3>
+            <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
+          </div>
+        ))}
+      </div>
+
+      
 
       {/* Our Story */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-10">
