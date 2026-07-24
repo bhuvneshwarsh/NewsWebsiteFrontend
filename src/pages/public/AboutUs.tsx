@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import type { EditorProfile } from '../../types/editor';
 import api from '../../services/api';
+import PRGI_QR from "../../../public/PRGI_QR.png";
+
 
 // ── Editor Profile Card ───────────────────────────────────────────────────────
 function EditorCard({ editor }: { editor: EditorProfile }) {
@@ -193,6 +195,8 @@ export default function AboutUs() {
 
       {/* Header */}
       <div className="text-center mb-12">
+        <img  src={PRGI_QR}  alt="PRGI QR"  className="w-20 h-20 object-contain mx-auto mt-5 mb-5"/>
+        
         <h1 className="font-serif text-3xl md:text-4xl font-bold text-gray-900 mb-4">
           About <span className="text-brand-600">प्रजातंत्र की गूंज</span>
         </h1>
@@ -200,7 +204,7 @@ export default function AboutUs() {
           A trusted voice for the people — delivering honest, accurate, and timely
           news across politics, culture, sports, and beyond.
         </p>
-        <div className="w-16 h-1 bg-brand-600 rounded-full mx-auto mt-5" />
+        
       </div>
 
       {/* ── EDITOR / SAMPADAK SECTION ─────────────────────────────────────── */}
