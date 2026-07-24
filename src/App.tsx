@@ -16,8 +16,8 @@ import TeamPage        from './pages/public/TeamPage';
 import EmployeeProfile from './pages/public/EmployeeProfile';
 import AboutUs         from './pages/public/AboutUs';
 import ContactUs       from './pages/public/ContactUs';
-import PrivacyPolicy   from './pages/public/PrivacyPolicy';    // ← NEW
-import TermsConditions from './pages/public/TermsConditions';  // ← NEW
+import PrivacyPolicy   from './pages/public/PrivacyPolicy';
+import TermsConditions from './pages/public/TermsConditions';
 import NotFound        from './pages/public/NotFound';
 
 // Auth
@@ -30,7 +30,7 @@ import EmployeeArticleEditor from './pages/employee/EmployeeArticleEditor';
 import ChangePassword        from './pages/employee/ChangePassword';
 import EmployeeGuide         from './pages/employee/EmployeeGuide';
 
-// Admin pages (lazy)
+// Admin pages (lazy loaded)
 const Dashboard     = lazy(() => import('./pages/admin/Dashboard'));
 const ArticleList   = lazy(() => import('./pages/admin/ArticleList'));
 const ArticleEditor = lazy(() => import('./pages/admin/ArticleEditor'));
@@ -38,6 +38,7 @@ const MediaManager  = lazy(() => import('./pages/admin/MediaManager'));
 const EPaperAdmin   = lazy(() => import('./pages/admin/EPaperAdmin'));
 const TeamManager   = lazy(() => import('./pages/admin/TeamManager'));
 const AdManager     = lazy(() => import('./pages/admin/AdManager'));
+const EditorManager = lazy(() => import('./pages/admin/EditorManager')); // ← NEW
 
 function Spinner() {
   return (
@@ -65,10 +66,9 @@ export default function App() {
               <Route path="/about"           element={<AboutUs />} />
               <Route path="/contact"         element={<ContactUs />} />
               <Route path="/employee-guide"  element={<EmployeeGuide />} />
-              {/* ── NEW: Legal pages required for AdSense ── */}
               <Route path="/privacy-policy"  element={<PrivacyPolicy />} />
               <Route path="/terms"           element={<TermsConditions />} />
-              <Route path="*"                element={<NotFound />} />
+              <Route path="*"               element={<NotFound />} />
             </Route>
 
             {/* ── Standalone routes ───────────────────────────────────────── */}
@@ -87,14 +87,15 @@ export default function App() {
 
             {/* ── Admin routes ─────────────────────────────────────────────── */}
             <Route path="/admin" element={<AdminLayout />}>
-              <Route index             element={<Dashboard />} />
-              <Route path="articles"   element={<ArticleList />} />
-              <Route path="editor"     element={<ArticleEditor />} />
-              <Route path="editor/:id" element={<ArticleEditor />} />
-              <Route path="media"      element={<MediaManager />} />
-              <Route path="epaper"     element={<EPaperAdmin />} />
-              <Route path="team"       element={<TeamManager />} />
-              <Route path="ads"        element={<AdManager />} />
+              <Route index                   element={<Dashboard />} />
+              <Route path="articles"         element={<ArticleList />} />
+              <Route path="editor"           element={<ArticleEditor />} />
+              <Route path="editor/:id"       element={<ArticleEditor />} />
+              <Route path="media"            element={<MediaManager />} />
+              <Route path="epaper"           element={<EPaperAdmin />} />
+              <Route path="team"             element={<TeamManager />} />
+              <Route path="ads"              element={<AdManager />} />
+              <Route path="editor-profiles"  element={<EditorManager />} /> {/* ← NEW */}
             </Route>
 
           </Routes>
