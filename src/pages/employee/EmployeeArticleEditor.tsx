@@ -87,13 +87,26 @@ export default function EmployeeArticleEditor() {
   const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploading(true); setUploadPct(0);
+
+    if (!file.type.startsWith('image/')) {
+      setError('Please upload a valid image file.');
+      return;
+    }
+
+    setUploading(true);
+    setUploadPct(0);
+    setError('');
+
     try {
       const res = await mediaApi.upload(file, pct => setUploadPct(pct));
       setThumbnailUrl(res.data.url);
       setImgErr(false);
-    } catch { setError('Image upload failed.'); }
-    finally   { setUploading(false); }
+    } catch (err: any) {
+      console.error('Thumbnail upload failed:', err);
+      setError(err.response?.data?.message ?? err.message ?? 'Image upload failed.');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const save = async () => {
