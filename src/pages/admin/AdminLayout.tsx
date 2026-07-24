@@ -4,19 +4,9 @@ import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard, FileText, Image, Newspaper,
   LogOut, Users, Megaphone, UserSquare,
-  Menu, X, ChevronLeft, ChevronRight
+  Menu, X, ChevronLeft, ChevronRight, ClipboardCheck
 } from 'lucide-react';
-
-const NAV_ITEMS = [
-  { to: '/admin',                label: 'Dashboard',       icon: LayoutDashboard, end: true },
-  { to: '/admin/articles',       label: 'Articles',        icon: FileText         },
-  { to: '/admin/editor',         label: 'New Article',     icon: FileText         },
-  { to: '/admin/media',          label: 'Media',           icon: Image            },
-  { to: '/admin/epaper',         label: 'E-Paper',         icon: Newspaper        },
-  { to: '/admin/team',           label: 'Team Manager',    icon: Users            },
-  { to: '/admin/editor-profiles',label: 'Editor Profiles', icon: UserSquare       }, // ← NEW
-  { to: '/admin/ads',            label: 'Advertisements',  icon: Megaphone        },
-];
+import api from '../../services/api';
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
@@ -26,6 +16,19 @@ export default function AdminLayout() {
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const [mobileOpen,       setMobileOpen]       = useState(false);
   const [isMobile,         setIsMobile]         = useState(window.innerWidth < 1024);
+  const [pendingCount,     setPendingCount]      = useState(0);
+
+  // Poll for pending approvals count every 60 seconds
+  useEffect(() => {
+    const fetchPending = () => {
+      api.get<{ success: boolean; data: any[] }>('/articles/pending')
+        .then(r => setPendingCount(r.data.data?.length ?? 0))
+        .catch(() => {});
+    };
+    fetchPending();
+    const interval = setInterval(fetchPending, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -44,6 +47,18 @@ export default function AdminLayout() {
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
+  const NAV_ITEMS = [
+    { to: '/admin',                 label: 'Dashboard',        icon: LayoutDashboard, end: true },
+    { to: '/admin/articles',        label: 'Articles',         icon: FileText         },
+    { to: '/admin/approvals',       label: 'Article Approvals',icon: ClipboardCheck,  badge: pendingCount },
+    { to: '/admin/editor',          label: 'New Article',      icon: FileText         },
+    { to: '/admin/media',           label: 'Media',            icon: Image            },
+    { to: '/admin/epaper',          label: 'E-Paper',          icon: Newspaper        },
+    { to: '/admin/team',            label: 'Team Manager',     icon: Users            },
+    { to: '/admin/editor-profiles', label: 'Editor Profiles',  icon: UserSquare       },
+    { to: '/admin/ads',             label: 'Advertisements',   icon: Megaphone        },
+  ];
+
   const SidebarContent = ({ collapsed = false }: { collapsed?: boolean }) => (
     <div className="flex flex-col h-full">
       <div className={`border-b border-gray-700
@@ -61,7 +76,7 @@ export default function AdminLayout() {
       </div>
 
       <nav className="flex-1 px-2 py-4 space-y-0.5 overflow-y-auto">
-        {NAV_ITEMS.map(({ to, label, icon: Icon, end }) => (
+        {NAV_ITEMS.map(({ to, label, icon: Icon, end, badge }) => (
           <NavLink key={to} to={to} end={end}
             title={collapsed ? label : undefined}
             className={({ isActive }) =>
@@ -71,7 +86,23 @@ export default function AdminLayout() {
                 ? 'bg-brand-600 text-white'
                 : 'text-gray-300 hover:bg-gray-800 hover:text-white'}`}>
             <Icon size={18} className="shrink-0" />
-            {!collapsed && <span className="truncate">{label}</span>}
+            {!collapsed && (
+              <span className="flex-1 truncate">{label}</span>
+            )}
+            {/* Pending badge */}
+            {!collapsed && badge && badge > 0 && (
+              <span className="bg-amber-500 text-white text-xs font-bold
+                px-1.5 py-0.5 rounded-full min-w-[20px] text-center leading-none">
+                {badge}
+              </span>
+            )}
+            {collapsed && badge && badge > 0 && (
+              <span className="absolute top-1 right-1 bg-amber-500 text-white
+                text-xs font-bold w-4 h-4 rounded-full flex items-center
+                justify-center leading-none">
+                {badge > 9 ? '9+' : badge}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>
@@ -86,8 +117,7 @@ export default function AdminLayout() {
         )}
         <button onClick={handleLogout} title="Sign out"
           className={`flex items-center gap-2 text-xs text-gray-400
-            hover:text-white transition px-1 py-1.5 rounded-lg
-            hover:bg-gray-800 w-full
+            hover:text-white transition px-1 py-1.5 rounded-lg hover:bg-gray-800 w-full
             ${collapsed ? 'justify-center' : ''}`}>
           <LogOut size={15} className="shrink-0" />
           {!collapsed && 'Sign out'}
@@ -99,13 +129,11 @@ export default function AdminLayout() {
   return (
     <div className="flex h-screen bg-gray-100 font-sans overflow-hidden">
 
-      {/* Mobile overlay */}
       {isMobile && mobileOpen && (
         <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
           onClick={() => setMobileOpen(false)} />
       )}
 
-      {/* Mobile drawer */}
       {isMobile && (
         <aside className={`fixed top-0 left-0 h-full z-50 bg-gray-900 text-white
           w-64 transition-transform duration-300 ease-in-out shadow-2xl
@@ -119,7 +147,6 @@ export default function AdminLayout() {
         </aside>
       )}
 
-      {/* Desktop sidebar */}
       {!isMobile && (
         <aside className={`relative bg-gray-900 text-white flex flex-col shrink-0
           transition-all duration-300 ease-in-out
@@ -135,13 +162,11 @@ export default function AdminLayout() {
       )}
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Mobile top bar */}
         {isMobile && (
           <div className="bg-white border-b border-gray-200 px-4 py-3
             flex items-center gap-3 shrink-0 shadow-sm">
             <button onClick={() => setMobileOpen(true)}
-              className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200
-                transition text-gray-700">
+              className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition text-gray-700">
               <Menu size={20} />
             </button>
             <div className="flex-1 min-w-0">
@@ -150,6 +175,14 @@ export default function AdminLayout() {
               </h1>
               <p className="text-xs text-gray-400">Admin Panel</p>
             </div>
+            {pendingCount > 0 && (
+              <NavLink to="/admin/approvals"
+                className="flex items-center gap-1.5 bg-amber-100 text-amber-700
+                  border border-amber-200 text-xs font-semibold px-2.5 py-1.5
+                  rounded-full">
+                <ClipboardCheck size={12} /> {pendingCount} Pending
+              </NavLink>
+            )}
             <div className="w-7 h-7 rounded-full bg-brand-600 flex items-center
               justify-center text-white text-xs font-bold shrink-0">
               {user.fullName?.[0] ?? 'A'}

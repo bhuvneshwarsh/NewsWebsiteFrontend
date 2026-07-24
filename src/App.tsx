@@ -31,14 +31,15 @@ import ChangePassword        from './pages/employee/ChangePassword';
 import EmployeeGuide         from './pages/employee/EmployeeGuide';
 
 // Admin pages (lazy loaded)
-const Dashboard     = lazy(() => import('./pages/admin/Dashboard'));
-const ArticleList   = lazy(() => import('./pages/admin/ArticleList'));
-const ArticleEditor = lazy(() => import('./pages/admin/ArticleEditor'));
-const MediaManager  = lazy(() => import('./pages/admin/MediaManager'));
-const EPaperAdmin   = lazy(() => import('./pages/admin/EPaperAdmin'));
-const TeamManager   = lazy(() => import('./pages/admin/TeamManager'));
-const AdManager     = lazy(() => import('./pages/admin/AdManager'));
-const EditorManager = lazy(() => import('./pages/admin/EditorManager')); // ← NEW
+const Dashboard        = lazy(() => import('./pages/admin/Dashboard'));
+const ArticleList      = lazy(() => import('./pages/admin/ArticleList'));
+const ArticleEditor    = lazy(() => import('./pages/admin/ArticleEditor'));
+const MediaManager     = lazy(() => import('./pages/admin/MediaManager'));
+const EPaperAdmin      = lazy(() => import('./pages/admin/EPaperAdmin'));
+const TeamManager      = lazy(() => import('./pages/admin/TeamManager'));
+const AdManager        = lazy(() => import('./pages/admin/AdManager'));
+const EditorManager    = lazy(() => import('./pages/admin/EditorManager'));
+const ArticleApprovals = lazy(() => import('./pages/admin/ArticleApprovals')); // ← NEW
 
 function Spinner() {
   return (
@@ -58,20 +59,20 @@ export default function App() {
 
             {/* ── Public routes ──────────────────────────────────────────── */}
             <Route element={<PublicLayout />}>
-              <Route path="/"                element={<Home />} />
-              <Route path="/category/:slug"  element={<CategoryPage />} />
-              <Route path="/news/:slug"      element={<ArticleDetail />} />
-              <Route path="/epaper"          element={<EPaperViewer />} />
-              <Route path="/team"            element={<TeamPage />} />
-              <Route path="/about"           element={<AboutUs />} />
-              <Route path="/contact"         element={<ContactUs />} />
-              <Route path="/employee-guide"  element={<EmployeeGuide />} />
-              <Route path="/privacy-policy"  element={<PrivacyPolicy />} />
-              <Route path="/terms"           element={<TermsConditions />} />
+              <Route path="/"               element={<Home />} />
+              <Route path="/category/:slug" element={<CategoryPage />} />
+              <Route path="/news/:slug"     element={<ArticleDetail />} />
+              <Route path="/epaper"         element={<EPaperViewer />} />
+              <Route path="/team"           element={<TeamPage />} />
+              <Route path="/about"          element={<AboutUs />} />
+              <Route path="/contact"        element={<ContactUs />} />
+              <Route path="/employee-guide" element={<EmployeeGuide />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms"          element={<TermsConditions />} />
               <Route path="*"               element={<NotFound />} />
             </Route>
 
-            {/* ── Standalone routes ───────────────────────────────────────── */}
+            {/* ── Standalone ──────────────────────────────────────────────── */}
             <Route path="/team/:employeeId" element={<EmployeeProfile />} />
             <Route path="/login"            element={<Login />} />
             <Route path="/employee-login"   element={<EmployeeLogin />} />
@@ -89,13 +90,14 @@ export default function App() {
             <Route path="/admin" element={<AdminLayout />}>
               <Route index                   element={<Dashboard />} />
               <Route path="articles"         element={<ArticleList />} />
+              <Route path="approvals"        element={<ArticleApprovals />} />  {/* ← NEW */}
               <Route path="editor"           element={<ArticleEditor />} />
               <Route path="editor/:id"       element={<ArticleEditor />} />
               <Route path="media"            element={<MediaManager />} />
               <Route path="epaper"           element={<EPaperAdmin />} />
               <Route path="team"             element={<TeamManager />} />
+              <Route path="editor-profiles"  element={<EditorManager />} />
               <Route path="ads"              element={<AdManager />} />
-              <Route path="editor-profiles"  element={<EditorManager />} /> {/* ← NEW */}
             </Route>
 
           </Routes>
