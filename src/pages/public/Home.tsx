@@ -1,22 +1,66 @@
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useArticles } from '../../hooks/useArticles';
+import { articlesApi } from '../../services/api';
+import type { ArticleListItem } from '../../types';
 import ArticleCard from '../../components/ui/ArticleCard';
 import { SkeletonCard, SkeletonFeatured } from '../../components/ui/Skeleton';
 import AdSlot from '../../components/ui/AdSlot';
 
-// Insert an inline ad after every N articles in the feed
 const INLINE_AD_EVERY = 5;
 
 export default function Home() {
-  const [searchParams] = useSearchParams();
-  const search = searchParams.get('q') ?? '';
-  const { articles, loading, error, hasMore, loadMore } = useArticles({ search });
+  const [searchParams]                  = useSearchParams();
+  const search                          = searchParams.get('q') ?? '';
+  const [articles,   setArticles]       = useState<ArticleListItem[]>([]);
+  const [loading,    setLoading]        = useState(true);
+  const [page,       setPage]           = useState(1);
+  const [hasMore,    setHasMore]        = useState(true);
+  const [error,      setError]          = useState('');
+
+  const PAGE_SIZE = 10;
+
+  const load = async (pageNum: number, reset: boolean) => {
+    setLoading(true);
+    try {
+      // FIX: ALWAYS use articlesApi.list() for public homepage
+      // Never pass ?all=true or ?mine=true here
+      // Backend will always return only published + approved articles
+      const r = await articlesApi.list({
+        page:  pageNum,
+        size:  PAGE_SIZE,
+        ...(search ? { q: search } : {}),
+      });
+      const data = r.data.data;
+      const items: ArticleListItem[] = data.items ?? [];
+
+      setArticles(prev => reset ? items : [...prev, ...items]);
+      setHasMore(items.length === PAGE_SIZE);
+    } catch {
+      setError('Failed to load articles. Please refresh.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Reset and reload when search changes
+  useEffect(() => {
+    setPage(1);
+    setArticles([]);
+    setError('');
+    load(1, true);
+  }, [search]);
+
+  const loadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    load(nextPage, false);
+  };
 
   const featured = articles[0];
   const rest     = articles.slice(1);
 
-  // Split rest into chunks so we can inject inline ads between them
-  const chunks: typeof rest[] = [];
+  // Split rest into chunks for inline ads
+  const chunks: ArticleListItem[][] = [];
   for (let i = 0; i < rest.length; i += INLINE_AD_EVERY) {
     chunks.push(rest.slice(i, i + INLINE_AD_EVERY));
   }
@@ -24,7 +68,7 @@ export default function Home() {
   return (
     <div className="container mx-auto px-4 py-6">
 
-      {/* ── Top Banner Ad ───────────────────────────────────────────────────── */}
+      {/* Top banner ad */}
       <AdSlot placement="banner_top" className="mb-6" />
 
       {search && (
@@ -40,7 +84,7 @@ export default function Home() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* ── Left: News feed ─────────────────────────────────────────────── */}
+        {/* News feed */}
         <div className="lg:col-span-2 space-y-4">
 
           {/* Featured hero */}
@@ -50,14 +94,12 @@ export default function Home() {
               ? <ArticleCard article={featured} featured />
               : null}
 
-          {/* Articles with inline ads injected between chunks */}
+          {/* Articles with inline ads */}
           {loading && articles.length === 0
             ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
             : chunks.map((chunk, chunkIdx) => (
                 <div key={chunkIdx} className="space-y-3">
                   {chunk.map(a => <ArticleCard key={a.id} article={a} />)}
-
-                  {/* Inline ad after each chunk (except the last if still loading) */}
                   {chunkIdx < chunks.length - 1 && (
                     <AdSlot placement="inline" className="py-2" />
                   )}
@@ -68,7 +110,8 @@ export default function Home() {
           {hasMore && !loading && (
             <button onClick={loadMore}
               className="w-full py-3 border border-gray-200 rounded-xl text-sm
-                text-gray-600 hover:border-brand-400 hover:text-brand-600 transition font-medium">
+                text-gray-600 hover:border-brand-400 hover:text-brand-600
+                transition font-medium">
               और खबरें लोड करें
             </button>
           )}
@@ -86,13 +129,12 @@ export default function Home() {
             </div>
           )}
 
-          {/* Bottom Banner Ad — below all articles */}
+          {/* Bottom banner ad */}
           <AdSlot placement="banner_bottom" className="mt-4" />
         </div>
 
-        {/* ── Right: Sidebar ───────────────────────────────────────────────── */}
+        {/* Sidebar */}
         <aside className="space-y-5">
-          {/* Sidebar ads — manual + Google AdSense can coexist here */}
           <AdSlot placement="sidebar" />
         </aside>
       </div>

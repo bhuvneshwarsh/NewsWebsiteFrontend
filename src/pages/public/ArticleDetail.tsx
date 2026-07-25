@@ -17,7 +17,6 @@ function isValidUrl(url: string | null | undefined): boolean {
   } catch { return false; }
 }
 
-// ── Strip HTML for meta description ──────────────────────────────────────────
 function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 160);
 }
@@ -32,7 +31,7 @@ export default function ArticleDetailPage() {
   const [viewCount, setViewCount] = useState<number | null>(null);
   const viewTracked = useRef(false);
 
-  // ── Set OG meta tags when article loads ──────────────────────────────────
+  // Set OG meta tags for social sharing
   useMetaTags(
     article
       ? {
@@ -60,6 +59,7 @@ export default function ArticleDetailPage() {
     viewTracked.current = false;
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
+    // FIX: uses updated route /articles/slug/{slug}
     articlesApi.getBySlug(slug)
       .then(r => {
         const data = r.data.data;
@@ -78,6 +78,7 @@ export default function ArticleDetailPage() {
     try {
       const sessionKey = `viewed_${articleSlug}`;
       if (sessionStorage.getItem(sessionKey)) return;
+      // FIX: uses updated route /articles/slug/{slug}/view
       await articlesApi.trackView(articleSlug);
       sessionStorage.setItem(sessionKey, '1');
       setViewCount(v => (v !== null ? v + 1 : currentViews + 1));
@@ -88,14 +89,15 @@ export default function ArticleDetailPage() {
     <div className="container mx-auto px-4 py-20 text-center">
       <p className="text-gray-500 mb-4">{error}</p>
       <button onClick={() => navigate(-1)}
-        className="text-brand-600 hover:underline text-sm flex items-center gap-1 mx-auto">
+        className="text-brand-600 hover:underline text-sm
+          flex items-center gap-1 mx-auto">
         <ArrowLeft size={14} /> Go back
       </button>
     </div>
   );
 
-  const showThumbnail = article?.thumbnailUrl &&
-    isValidUrl(article.thumbnailUrl) && !imgError;
+  const showThumbnail = article?.thumbnailUrl
+    && isValidUrl(article.thumbnailUrl) && !imgError;
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-6xl">
@@ -103,6 +105,7 @@ export default function ArticleDetailPage() {
       <AdSlot placement="banner_top" className="mb-6" />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
         <article className="lg:col-span-2">
 
           {/* Breadcrumb */}
@@ -126,7 +129,6 @@ export default function ArticleDetailPage() {
             </div>
           ) : article ? (
             <>
-              {/* Category badge */}
               <Link to={`/category/${article.categoryName.toLowerCase()}`}>
                 <span className="inline-block bg-brand-600 text-white text-xs
                   font-semibold px-2.5 py-1 rounded mb-3">
@@ -134,13 +136,12 @@ export default function ArticleDetailPage() {
                 </span>
               </Link>
 
-              {/* Title */}
               <h1 className="font-serif text-2xl md:text-3xl font-bold text-gray-900
                 leading-tight mb-4">
                 {article.title}
               </h1>
 
-              {/* Meta row — author, date, views, SHARE BUTTON */}
+              {/* Meta row */}
               <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500
                 mb-5 pb-5 border-b border-gray-100">
                 <span className="flex items-center gap-1.5">
@@ -151,7 +152,8 @@ export default function ArticleDetailPage() {
                     <Clock size={14} />
                     {format(new Date(article.publishedAt), 'dd MMM yyyy, h:mm a')}
                     <span className="text-gray-300">
-                      ({formatDistanceToNow(new Date(article.publishedAt), { addSuffix: true })})
+                      ({formatDistanceToNow(
+                        new Date(article.publishedAt), { addSuffix: true })})
                     </span>
                   </span>
                 )}
@@ -159,8 +161,6 @@ export default function ArticleDetailPage() {
                   <Eye size={14} />
                   {(viewCount ?? article.views).toLocaleString()} views
                 </span>
-
-                {/* ── Share button in meta row ── */}
                 <div className="ml-auto">
                   <ShareButton
                     title={article.title}
@@ -171,21 +171,16 @@ export default function ArticleDetailPage() {
                 </div>
               </div>
 
-              {/* Thumbnail */}
               {showThumbnail && (
                 <div className="rounded-2xl overflow-hidden mb-6 aspect-video bg-gray-100">
-                  <img
-                    src={article.thumbnailUrl!}
-                    alt={article.title}
+                  <img src={article.thumbnailUrl!} alt={article.title}
                     className="w-full h-full object-cover"
-                    onError={() => setImgError(true)}
-                  />
+                    onError={() => setImgError(true)} />
                 </div>
               )}
 
               <AdSlot placement="inline" className="mb-6" />
 
-              {/* Article body */}
               <div
                 className="prose prose-gray max-w-none prose-headings:font-serif
                   prose-a:text-brand-600 prose-img:rounded-xl
@@ -193,7 +188,7 @@ export default function ArticleDetailPage() {
                 dangerouslySetInnerHTML={{ __html: article.content }}
               />
 
-              {/* ── Bottom share section ──────────────────────────────────── */}
+              {/* Bottom share */}
               <div className="mt-8 pt-6 border-t border-gray-100">
                 <div className="bg-gray-50 rounded-2xl p-5 flex flex-col sm:flex-row
                   items-center gap-4">
@@ -217,7 +212,6 @@ export default function ArticleDetailPage() {
           ) : null}
         </article>
 
-        {/* Sidebar */}
         <aside className="space-y-5 lg:sticky lg:top-20 self-start">
           <AdSlot placement="sidebar" />
         </aside>
