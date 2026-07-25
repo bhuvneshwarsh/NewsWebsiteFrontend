@@ -1,57 +1,41 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../services/api';
+import { articlesApi } from '../../services/api';
 import type { ArticleListItem } from '../../types';
 import {
   Plus, Eye, Pencil, FileText,
   Clock, CheckCircle, XCircle, AlertTriangle
 } from 'lucide-react';
 
-// ── Approval status badge ─────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
-  const map: Record<string, { label: string; class: string; icon: React.ReactNode }> = {
-    Pending: {
-      label: 'Pending Approval',
-      class: 'bg-amber-100 text-amber-700 border-amber-200',
-      icon:  <Clock size={11} />,
-    },
-    Approved: {
-      label: 'Approved & Live',
-      class: 'bg-green-100 text-green-700 border-green-200',
-      icon:  <CheckCircle size={11} />,
-    },
-    Rejected: {
-      label: 'Rejected',
-      class: 'bg-red-100 text-red-700 border-red-200',
-      icon:  <XCircle size={11} />,
-    },
-    NotRequired: {
-      label: 'Published',
-      class: 'bg-green-100 text-green-700 border-green-200',
-      icon:  <CheckCircle size={11} />,
-    },
+  const map: Record<string, { label: string; cls: string; icon: React.ReactNode }> = {
+    Pending:     { label: 'Pending Approval', cls: 'bg-amber-100 text-amber-700 border-amber-200', icon: <Clock size={11} /> },
+    Approved:    { label: 'Approved & Live',  cls: 'bg-green-100 text-green-700 border-green-200', icon: <CheckCircle size={11} /> },
+    Rejected:    { label: 'Rejected',          cls: 'bg-red-100 text-red-700 border-red-200',       icon: <XCircle size={11} /> },
+    NotRequired: { label: 'Published',         cls: 'bg-green-100 text-green-700 border-green-200', icon: <CheckCircle size={11} /> },
   };
   const s = map[status] ?? map.Pending;
   return (
     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full
-      text-xs font-medium border ${s.class}`}>
+      text-xs font-medium border ${s.cls}`}>
       {s.icon} {s.label}
     </span>
   );
 }
 
 export default function EmployeeDashboard() {
-  const { user }  = useAuth();
+  const { user }   = useAuth();
   const [articles, setArticles] = useState<ArticleListItem[]>([]);
   const [loading,  setLoading]  = useState(true);
 
   useEffect(() => {
-    // ?all=true with Employee JWT → backend returns only this employee's articles
-    api.get<{ success: boolean; data: { items: ArticleListItem[] } }>(
-      '/articles?all=true&size=50'
-    )
-      .then(r => setArticles(r.data.data.items))
+    // FIX: Use myArticles() which passes ?mine=true
+    // This ensures backend filters by authorId from JWT token
+    // and does NOT accidentally show public articles
+    articlesApi.myArticles()
+      .then(r => setArticles(r.data.data?.items ?? r.data.data ?? []))
+      .catch(() => setArticles([]))
       .finally(() => setLoading(false));
   }, []);
 
@@ -62,7 +46,6 @@ export default function EmployeeDashboard() {
   return (
     <div className="p-5 max-w-5xl">
 
-      {/* Welcome */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">
@@ -79,14 +62,12 @@ export default function EmployeeDashboard() {
         </Link>
       </div>
 
-      {/* How approval works — info box */}
+      {/* Approval info */}
       <div className="bg-blue-50 border border-blue-100 rounded-2xl px-5 py-4 mb-6
         flex items-start gap-3">
         <AlertTriangle size={17} className="text-blue-500 shrink-0 mt-0.5" />
         <div>
-          <p className="text-sm font-semibold text-blue-800">
-            लेख प्रकाशन प्रक्रिया
-          </p>
+          <p className="text-sm font-semibold text-blue-800">लेख प्रकाशन प्रक्रिया</p>
           <p className="text-xs text-blue-700 mt-0.5 leading-relaxed">
             आपके द्वारा लिखा गया हर लेख पहले <strong>Super Admin के अनुमोदन</strong> के
             लिए जाएगा। अनुमोदित होने के बाद ही वेबसाइट पर प्रकाशित होगा।
@@ -98,13 +79,12 @@ export default function EmployeeDashboard() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         {[
-          { label: 'कुल लेख',        value: articles.length, color: 'text-gray-800',   bg: 'bg-gray-50'   },
-          { label: 'अनुमोदन प्रतीक्षा', value: pending,         color: 'text-amber-700', bg: 'bg-amber-50'  },
-          { label: 'प्रकाशित',        value: approved,        color: 'text-green-700', bg: 'bg-green-50'  },
-          { label: 'अस्वीकृत',       value: rejected,        color: 'text-red-700',   bg: 'bg-red-50'    },
+          { label: 'कुल लेख',           value: articles.length, color: 'text-gray-800',   bg: 'bg-gray-50'  },
+          { label: 'अनुमोदन प्रतीक्षा', value: pending,         color: 'text-amber-700', bg: 'bg-amber-50' },
+          { label: 'प्रकाशित',          value: approved,        color: 'text-green-700', bg: 'bg-green-50' },
+          { label: 'अस्वीकृत',         value: rejected,        color: 'text-red-700',   bg: 'bg-red-50'   },
         ].map(s => (
-          <div key={s.label}
-            className={`${s.bg} rounded-2xl p-4 border border-gray-100`}>
+          <div key={s.label} className={`${s.bg} rounded-2xl p-4 border border-gray-100`}>
             <p className={`text-3xl font-bold ${s.color}`}>{s.value}</p>
             <p className="text-xs text-gray-500 mt-1">{s.label}</p>
           </div>
@@ -124,9 +104,7 @@ export default function EmployeeDashboard() {
           <div className="p-12 text-center text-gray-400">
             <FileText size={40} className="mx-auto mb-3 opacity-30" />
             <p className="font-medium">अभी तक कोई लेख नहीं।</p>
-            <p className="text-xs mt-1">
-              "New Article" पर क्लिक करके अपना पहला लेख लिखें।
-            </p>
+            <p className="text-xs mt-1">New Article पर क्लिक करके पहला लेख लिखें।</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -140,21 +118,18 @@ export default function EmployeeDashboard() {
               </thead>
               <tbody>
                 {articles.map(a => (
-                  <tr key={a.id}
-                    className="border-t border-gray-50 hover:bg-gray-50 transition">
+                  <tr key={a.id} className="border-t border-gray-50 hover:bg-gray-50 transition">
                     <td className="px-4 py-3 max-w-xs">
                       <p className="font-medium text-gray-800 truncate">{a.title}</p>
-                      {/* Show rejection reason inline */}
                       {a.approvalStatus === 'Rejected' && a.approvalNote && (
                         <div className="mt-1 flex items-start gap-1.5 bg-red-50
                           border border-red-100 rounded-lg px-2 py-1.5">
                           <XCircle size={11} className="text-red-500 shrink-0 mt-0.5" />
                           <p className="text-xs text-red-600 leading-snug">
-                            <strong>अस्वीकृति कारण:</strong> {a.approvalNote}
+                            <strong>कारण:</strong> {a.approvalNote}
                           </p>
                         </div>
                       )}
-                      {/* Pending message */}
                       {a.approvalStatus === 'Pending' && (
                         <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
                           <Clock size={10} /> Super Admin की समीक्षा का इंतज़ार है…
@@ -176,9 +151,7 @@ export default function EmployeeDashboard() {
                       {new Date(a.createdAt).toLocaleDateString('hi-IN')}
                     </td>
                     <td className="px-4 py-3">
-                      {/* Only allow editing Rejected or Pending articles */}
-                      {(a.approvalStatus === 'Rejected' ||
-                        a.approvalStatus === 'Pending') && (
+                      {(a.approvalStatus === 'Rejected' || a.approvalStatus === 'Pending') && (
                         <Link to={`/employee/editor/${a.id}`}
                           className="flex items-center gap-1 text-xs text-blue-500
                             hover:text-blue-700 transition bg-blue-50 border
