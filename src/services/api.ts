@@ -175,4 +175,5 @@ export const editorsApi = {
   delete:    (id: number) => api.delete<ApiResponse<any>>(`/editors/${id}`),
 };
 
+
 export default api;
