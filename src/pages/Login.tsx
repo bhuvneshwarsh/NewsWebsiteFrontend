@@ -1,107 +1,150 @@
-import { useState, useEffect, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, FormEvent } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { authApi } from '../services/api';
+import api from '../services/api';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
+  const [showPwd,  setShowPwd]  = useState(false);
   const [error,    setError]    = useState('');
   const [loading,  setLoading]  = useState(false);
-  const { login, user } = useAuth();
-  const navigate  = useNavigate();
-
-  useEffect(() => {
-    if (user) {
-      navigate('/admin', { replace: true });
-    }
-  }, [user, navigate]);
+  const { login }  = useAuth();
+  const navigate   = useNavigate();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(''); setLoading(true);
     try {
-      const res = await authApi.login(email, password);
-      console.log('login response', res);
-      const raw = res.data as any;
-      const success = raw.success ?? raw.Success;
-      const message = raw.message ?? raw.Message;
-      const data = raw.data ?? raw.Data;
-
-      if (success && data) {
-        const userData = {
-          token:    data.token ?? data.Token,
-          fullName: data.fullName ?? data.FullName,
-          email:    data.email ?? data.Email,
-          role:     data.role ?? data.Role,
-          expiry:   data.expiry ?? data.Expiry,
+      // Direct api call to /auth/login
+      // baseURL is /api so full URL becomes /api/auth/login
+      const res = await api.post<{
+        success: boolean;
+        message: string;
+        data: {
+          token:    string;
+          fullName: string;
+          email:    string;
+          role:     string;
+          expiry:   string;
         };
-        login(userData);
+      }>('/auth/login', { email: email.trim(), password });
+
+      if (!res.data.success) {
+        setError(res.data.message || 'Login failed. Please try again.');
+        return;
+      }
+
+      const d = res.data.data;
+      login({
+        token:    d.token,
+        fullName: d.fullName,
+        email:    d.email,
+        role:     d.role,
+        expiry:   d.expiry,
+      });
+
+      // Redirect based on role
+      if (d.role === 'Employee') {
+        navigate('/employee/dashboard');
       } else {
-        setError(message || 'Login failed. Please try again.');
+        navigate('/admin');
       }
     } catch (err: any) {
-      console.error('login error', err);
-      setError(err.response?.data?.message ?? err.response?.data?.Message ?? 'Login failed. Please try again.');
+      const status = err.response?.status;
+      if (status === 405) {
+        setError('Server configuration error (405). Please contact the administrator.');
+      } else if (status === 401) {
+        setError('Invalid email or password. Please try again.');
+      } else {
+        setError(err.response?.data?.message ?? 'Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-8">
-        <div className="text-center mb-8">
-          <h1 className="font-serif text-3xl font-bold text-gray-900">Prajatantr Ki Gunj</h1>
-          <p className="text-gray-500 mt-1 text-sm">Admin Portal</p>
+    <div className="min-h-screen bg-gradient-to-br from-brand-700 to-gray-900
+      flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+
+        {/* Header */}
+        <div className="bg-gradient-to-r from-brand-600 to-brand-800 px-8 py-8 text-center">
+          <h1 className="font-serif text-2xl font-bold text-white">
+            Prajatantr Ki Gunj
+          </h1>
+          <p className="text-brand-200 text-sm mt-1">Admin Portal</p>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-            {error}
-          </div>
-        )}
+        <div className="px-8 py-8">
+          {error && (
+            <div className="mb-5 p-3 bg-red-50 border border-red-200 rounded-xl
+              text-red-700 text-sm">
+              {error}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email" required
-              value={email} onChange={e => setEmail(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-              placeholder="admin@prajatantrkigunj.com"
-            />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5
+                uppercase tracking-wide">
+                Email
+              </label>
+              <input
+                required
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="admin@prajatantrkigunj.com"
+                className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm
+                  focus:outline-none focus:ring-2 focus:ring-brand-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1.5
+                uppercase tracking-wide">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  required
+                  type={showPwd ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-3
+                    text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 pr-11"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPwd(s => !s)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2
+                    text-gray-400 hover:text-gray-600">
+                  {showPwd ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-brand-600 hover:bg-brand-700 text-white
+                font-semibold py-3 rounded-xl transition disabled:opacity-60 text-sm">
+              {loading ? 'Signing in…' : 'Sign In'}
+            </button>
+          </form>
+
+          <div className="mt-6 pt-5 border-t border-gray-100 text-center">
+            <Link to="/" className="text-sm text-gray-400 hover:text-brand-600 transition">
+              Go to Home page{' '}
+              <span className="text-brand-600 font-medium">Home</span>
+            </Link>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-            <input
-              type="password" required
-              value={password} onChange={e => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-              placeholder="••••••••"
-            />
-          </div>
-          <button
-            type="submit" disabled={loading}
-            className="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-lg transition disabled:opacity-60"
-          >
-            {loading ? 'Signing in…' : 'Sign In'}
-          </button>
-          <div className="text-center text-sm text-gray-500 mt-2">
-            <span>Go to Home page </span>
-            <a href="/" className="text-brand-600 hover:underline">Home</a>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   );
 }
-
-type ApiResponse<T> = {
-  success?: boolean;
-  message?: string;
-  data?: T;
-  Success?: boolean;
-  Message?: string;
-  Data?: T;
-};
