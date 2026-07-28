@@ -4,32 +4,12 @@ import {
   CheckCircle, XCircle, Eye, Clock,
   User, FileText, AlertTriangle, RefreshCw, X
 } from 'lucide-react';
-import api from '../../services/api';
-
-interface ArticleItem {
-  id:             number;
-  title:          string;
-  slug:           string;
-  thumbnailUrl:   string | null;
-  categoryName:   string;
-  authorName:     string;
-  approvalStatus: string;
-  approvalNote:   string | null;
-  views:          number;
-  createdAt:      string;
-}
-
-interface ArticleDetail extends ArticleItem {
-  content:    string;
-  categoryId: number;
-  authorId:   number;
-  isPublished: boolean;
-  publishedAt: string | null;
-}
+import { articlesApi } from '../../services/api';
+import type { ArticleListItem, ArticleDetail } from '../../types';
 
 // ── Preview Modal ─────────────────────────────────────────────────────────────
 function PreviewModal({ article, onClose, onApprove, onReject }: {
-  article:   ArticleItem;
+  article:   ArticleListItem;
   onClose:   () => void;
   onApprove: (id: number) => Promise<void>;
   onReject:  (id: number, note: string) => Promise<void>;
@@ -42,10 +22,7 @@ function PreviewModal({ article, onClose, onApprove, onReject }: {
   const [error,      setError]      = useState('');
 
   useEffect(() => {
-    // FIX: Use new /articles-preview/{id} route — avoids route conflict
-    api.get<{ success: boolean; data: ArticleDetail }>(
-      `/articles-preview/${article.id}`
-    )
+    articlesApi.preview(article.id)
       .then(r => setDetail(r.data.data))
       .catch(() => setError('Failed to load article preview.'))
       .finally(() => setLoading(false));
@@ -53,25 +30,15 @@ function PreviewModal({ article, onClose, onApprove, onReject }: {
 
   const handleApprove = async () => {
     setWorking(true);
-    try {
-      await onApprove(article.id);
-      onClose();
-    } catch {
-      setError('Approval failed. Try again.');
-      setWorking(false);
-    }
+    try { await onApprove(article.id); onClose(); }
+    catch { setError('Approval failed. Try again.'); setWorking(false); }
   };
 
   const handleReject = async () => {
     if (!note.trim()) { setError('Please enter a rejection reason.'); return; }
     setWorking(true);
-    try {
-      await onReject(article.id, note.trim());
-      onClose();
-    } catch {
-      setError('Rejection failed. Try again.');
-      setWorking(false);
-    }
+    try { await onReject(article.id, note.trim()); onClose(); }
+    catch { setError('Rejection failed. Try again.'); setWorking(false); }
   };
 
   return (
@@ -110,16 +77,14 @@ function PreviewModal({ article, onClose, onApprove, onReject }: {
           {loading ? (
             <div className="space-y-3 animate-pulse">
               {[100, 90, 95, 85, 80].map((w, i) => (
-                <div key={i} className="h-4 bg-gray-200 rounded"
-                  style={{ width: `${w}%` }} />
+                <div key={i} className="h-4 bg-gray-200 rounded" style={{ width: `${w}%` }} />
               ))}
             </div>
           ) : detail ? (
             <>
               {detail.thumbnailUrl && (
                 <img src={detail.thumbnailUrl} alt={detail.title}
-                  className="w-full h-48 object-cover rounded-xl mb-5
-                    border border-gray-100" />
+                  className="w-full h-48 object-cover rounded-xl mb-5 border border-gray-100" />
               )}
               <div className="flex flex-wrap gap-2 mb-4">
                 <span className="bg-brand-100 text-brand-700 text-xs font-semibold
@@ -136,8 +101,7 @@ function PreviewModal({ article, onClose, onApprove, onReject }: {
                   {format(new Date(detail.createdAt), 'dd MMM yyyy')}
                 </span>
               </div>
-              <h1 className="font-serif text-xl font-bold text-gray-900 mb-4
-                leading-snug">
+              <h1 className="font-serif text-xl font-bold text-gray-900 mb-4 leading-snug">
                 {detail.title}
               </h1>
               <div className="prose prose-sm prose-gray max-w-none border-t
@@ -161,29 +125,21 @@ function PreviewModal({ article, onClose, onApprove, onReject }: {
                   (employee will see this on their dashboard)
                 </span>
               </label>
-              <textarea
-                value={note}
-                onChange={e => setNote(e.target.value)}
-                rows={3}
-                placeholder="e.g. कृपया खबर के तथ्यों की जाँच करें और स्रोत का उल्लेख करें..."
+              <textarea value={note} onChange={e => setNote(e.target.value)}
+                rows={3} placeholder="e.g. कृपया खबर के तथ्यों की जाँच करें और स्रोत का उल्लेख करें..."
                 className="w-full border border-gray-300 rounded-xl px-3 py-2.5
-                  text-sm focus:outline-none focus:ring-2 focus:ring-red-400
-                  resize-none"
-              />
+                  text-sm focus:outline-none focus:ring-2 focus:ring-red-400 resize-none" />
               {error && <p className="text-xs text-red-600">{error}</p>}
               <div className="flex gap-3">
-                <button
-                  onClick={() => { setRejectMode(false); setError(''); }}
+                <button onClick={() => { setRejectMode(false); setError(''); }}
                   className="flex-1 border border-gray-200 text-gray-600 text-sm
                     py-2.5 rounded-xl hover:bg-gray-100 transition">
                   Back
                 </button>
-                <button
-                  onClick={handleReject}
-                  disabled={!note.trim() || working}
-                  className="flex-1 bg-red-600 hover:bg-red-700 text-white
-                    text-sm font-semibold py-2.5 rounded-xl transition
-                    disabled:opacity-50 flex items-center justify-center gap-2">
+                <button onClick={handleReject} disabled={!note.trim() || working}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white text-sm
+                    font-semibold py-2.5 rounded-xl transition disabled:opacity-50
+                    flex items-center justify-center gap-2">
                   <XCircle size={16} />
                   {working ? 'Rejecting…' : 'Confirm Rejection'}
                 </button>
@@ -193,16 +149,13 @@ function PreviewModal({ article, onClose, onApprove, onReject }: {
             <>
               {error && <p className="text-xs text-red-600 mb-3">{error}</p>}
               <div className="flex gap-3">
-                <button
-                  onClick={() => setRejectMode(true)}
+                <button onClick={() => setRejectMode(true)}
                   className="flex-1 flex items-center justify-center gap-2
                     border-2 border-red-200 text-red-600 hover:bg-red-50
                     font-semibold text-sm py-2.5 rounded-xl transition">
                   <XCircle size={16} /> Reject
                 </button>
-                <button
-                  onClick={handleApprove}
-                  disabled={working}
+                <button onClick={handleApprove} disabled={working}
                   className="flex-1 flex items-center justify-center gap-2
                     bg-green-600 hover:bg-green-700 text-white font-semibold
                     text-sm py-2.5 rounded-xl transition disabled:opacity-50">
@@ -220,27 +173,19 @@ function PreviewModal({ article, onClose, onApprove, onReject }: {
 
 // ── Main Approvals Page ───────────────────────────────────────────────────────
 export default function ArticleApprovals() {
-  const [articles,   setArticles]   = useState<ArticleItem[]>([]);
+  const [articles,   setArticles]   = useState<ArticleListItem[]>([]);
   const [loading,    setLoading]    = useState(true);
-  const [previewing, setPreviewing] = useState<ArticleItem | null>(null);
+  const [previewing, setPreviewing] = useState<ArticleListItem | null>(null);
   const [imgErrs,    setImgErrs]    = useState<Set<number>>(new Set());
   const [error,      setError]      = useState('');
 
   const load = async () => {
     setLoading(true); setError('');
     try {
-      // FIX: Use /articles-pending instead of /articles/pending
-      // This avoids the Azure Functions route conflict where
-      // /articles/pending was matched as /articles/{slug} with slug="pending"
-      const r = await api.get<{ success: boolean; data: ArticleItem[] }>(
-        '/articles-pending'
-      );
+      const r = await articlesApi.getPending();
       setArticles(r.data.data ?? []);
     } catch (err: any) {
-      setError(
-        err.response?.data?.message ??
-        'Failed to load pending articles. Please refresh.'
-      );
+      setError(err.response?.data?.message ?? 'Failed to load pending articles.');
     } finally {
       setLoading(false);
     }
@@ -249,24 +194,22 @@ export default function ArticleApprovals() {
   useEffect(() => { load(); }, []);
 
   const handleApprove = async (id: number) => {
-    await api.post(`/articles/${id}/approve`);
+    await articlesApi.approve(id);
     load();
   };
 
   const handleReject = async (id: number, note: string) => {
-    await api.post(`/articles/${id}/reject`, { note });
+    await articlesApi.reject(id, note);
     load();
   };
 
   return (
     <div className="p-6">
-
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Article Approvals</h2>
           <p className="text-sm text-gray-500 mt-0.5">
-            Review articles submitted by employees before they go live
+            Review articles submitted by employees before they go live on the website
           </p>
         </div>
         <button onClick={load}
@@ -284,8 +227,8 @@ export default function ArticleApprovals() {
         <p className="text-sm text-amber-700">
           Articles submitted by employees are held here for your review.
           Click <strong>Preview &amp; Review</strong> to read the full article.
-          <strong> Approved articles publish immediately.</strong>{' '}
-          Rejected articles show the reason to the employee on their dashboard.
+          <strong> Approved articles publish immediately.</strong>
+          Rejected articles are returned to the employee with your reason.
         </p>
       </div>
 
@@ -308,16 +251,10 @@ export default function ArticleApprovals() {
       {/* Error */}
       {error && (
         <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-2xl
-          text-red-700 text-sm flex items-center justify-between">
-          <span>{error}</span>
-          <button onClick={load}
-            className="text-red-700 font-semibold hover:underline text-xs ml-4">
-            Try again
-          </button>
-        </div>
+          text-red-700 text-sm">{error}</div>
       )}
 
-      {/* Articles list */}
+      {/* Article list */}
       {loading ? (
         <div className="bg-white rounded-2xl shadow-sm p-10 text-center
           text-gray-400 text-sm">
@@ -341,12 +278,10 @@ export default function ArticleApprovals() {
               <div className="flex items-start gap-4 p-5">
 
                 {/* Thumbnail */}
-                <div className="w-20 h-16 rounded-xl overflow-hidden shrink-0
-                  bg-gray-100">
+                <div className="w-20 h-16 rounded-xl overflow-hidden shrink-0 bg-gray-100">
                   {article.thumbnailUrl && !imgErrs.has(article.id) ? (
                     <img src={article.thumbnailUrl} alt={article.title}
-                      onError={() =>
-                        setImgErrs(s => new Set([...s, article.id]))}
+                      onError={() => setImgErrs(s => new Set([...s, article.id]))}
                       className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
@@ -359,9 +294,7 @@ export default function ArticleApprovals() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-3">
                     <h3 className="font-semibold text-gray-800 text-sm
-                      leading-snug line-clamp-2">
-                      {article.title}
-                    </h3>
+                      leading-snug line-clamp-2">{article.title}</h3>
                     <span className="shrink-0 px-2 py-1 bg-amber-100 text-amber-700
                       text-xs font-semibold rounded-full border border-amber-200">
                       Pending
@@ -372,8 +305,7 @@ export default function ArticleApprovals() {
                     <span className="flex items-center gap-1">
                       <User size={11} /> {article.authorName}
                     </span>
-                    <span className="bg-gray-100 text-gray-600 px-2 py-0.5
-                      rounded-full">
+                    <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
                       {article.categoryName}
                     </span>
                     <span className="flex items-center gap-1">
@@ -383,13 +315,12 @@ export default function ArticleApprovals() {
                   </div>
                 </div>
 
-                {/* Action buttons */}
+                {/* Actions */}
                 <div className="flex flex-col gap-2 shrink-0">
-                  <button
-                    onClick={() => setPreviewing(article)}
+                  <button onClick={() => setPreviewing(article)}
                     className="flex items-center gap-1.5 text-xs bg-blue-50
                       hover:bg-blue-100 text-blue-600 border border-blue-200
-                      px-3 py-2 rounded-xl transition font-medium whitespace-nowrap">
+                      px-3 py-2 rounded-xl transition font-medium">
                     <Eye size={13} /> Preview & Review
                   </button>
                   <div className="flex gap-2">
@@ -403,8 +334,7 @@ export default function ArticleApprovals() {
                         border border-green-200 px-2 py-1.5 rounded-lg transition">
                       <CheckCircle size={12} /> Approve
                     </button>
-                    <button
-                      onClick={() => setPreviewing(article)}
+                    <button onClick={() => setPreviewing(article)}
                       className="flex-1 flex items-center justify-center gap-1
                         text-xs bg-red-50 hover:bg-red-100 text-red-600
                         border border-red-200 px-2 py-1.5 rounded-lg transition">
@@ -418,7 +348,6 @@ export default function ArticleApprovals() {
         </div>
       )}
 
-      {/* Preview modal */}
       {previewing && (
         <PreviewModal
           article={previewing}
