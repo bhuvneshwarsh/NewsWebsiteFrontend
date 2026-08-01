@@ -1,3 +1,4 @@
+import { Facebook, Instagram, Youtube, Twitter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Footer() {
@@ -5,6 +6,13 @@ export default function Footer() {
   const formattedDate = new Date().toLocaleDateString('en-IN', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
+
+  const socialLinks = [
+    { href: 'https://www.facebook.com/prajatantrkigunj', label: 'Facebook', icon: Facebook, color: 'hover:text-blue-500' },
+    { href: 'https://x.com/PGNewsIndia', label: 'Twitter', icon: Twitter, color: 'hover:text-sky-400' },
+    { href: 'https://www.instagram.com/prajatantrakigunj', label: 'Instagram', icon: Instagram, color: 'hover:text-pink-500' },
+    { href: 'https://www.youtube.com/@PrajatantrKiGunj', label: 'YouTube', icon: Youtube, color: 'hover:text-red-500' },
+  ];
 
   return (
     <footer className="bg-gray-900 text-gray-400 mt-16">
@@ -78,6 +86,26 @@ export default function Footer() {
                   className="hover:text-white transition">Advertise With Us</Link>
               </li>
             </ul>
+
+            <div className="mt-5">
+              <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-3">
+                Follow Us
+              </h4>
+              <div className="flex items-center gap-3">
+                {socialLinks.map(({ href, label, icon: Icon, color }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={label}
+                    className={`group flex h-10 w-10 items-center justify-center rounded-full border border-gray-700 bg-gray-800 text-gray-300 transition duration-300 hover:-translate-y-1 hover:scale-110 hover:border-white/40 ${color}`}
+                  >
+                    <Icon className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
+                  </a>
+                ))}
+              </div>
+            </div>
 
             {/* AdSense disclosure — required */}
             <div className="mt-4 bg-gray-800 rounded-lg p-3">

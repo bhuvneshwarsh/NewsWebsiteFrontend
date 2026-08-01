@@ -1,5 +1,8 @@
 import { useState, FormEvent } from 'react';
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from 'lucide-react';
+import {
+  Mail, Phone, MapPin, Clock, Send, CheckCircle,
+  Facebook, Twitter, Instagram, Youtube
+} from 'lucide-react';
 
 export default function ContactUs() {
   const [form,      setForm]      = useState({ name: '', email: '', subject: '', message: '' });
@@ -131,6 +134,35 @@ export default function ContactUs() {
               </form>
             </>
           )}
+        </div>
+      </div>
+
+      {/* Follow Us */}
+      <div className="mt-8 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+        <div className="flex flex-col items-center justify-center gap-3 text-center">
+          <h3 className="font-serif text-xl font-bold text-gray-900">Follow Us</h3>
+          <p className="text-sm text-gray-500">
+            Stay connected with Prajatantr Ki Gunj across social media.
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            {[
+              { href: 'https://www.facebook.com/prajatantrkigunj', label: 'Facebook', icon: Facebook, color: 'text-blue-600 hover:bg-blue-50' },
+              { href: 'https://x.com/PGNewsIndia', label: 'Twitter', icon: Twitter, color: 'text-sky-500 hover:bg-sky-50' },
+              { href: 'https://www.instagram.com/prajatantrakigunj', label: 'Instagram', icon: Instagram, color: 'text-pink-500 hover:bg-pink-50' },
+              { href: 'https://www.youtube.com/@PrajatantrKiGunj', label: 'YouTube', icon: Youtube, color: 'text-red-500 hover:bg-red-50' },
+            ].map(({ href, label, icon: Icon, color }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={label}
+                className={`group flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-gray-50 transition duration-300 hover:-translate-y-1 hover:scale-110 hover:border-gray-300 ${color}`}
+              >
+                <Icon className="h-4 w-4 transition-transform duration-300 group-hover:scale-110" />
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </div>
