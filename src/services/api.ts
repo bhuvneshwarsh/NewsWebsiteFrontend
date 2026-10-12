@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // ── Base axios instance ───────────────────────────────────────────────────────
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
 });
 
 // Attach JWT to every request automatically
