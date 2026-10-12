@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { epaperApi } from '../../services/api';
 import type { EPaper } from '../../types';
-import { FileText, Calendar, ChevronLeft, ChevronRight, Download, ExternalLink } from 'lucide-react';
-import { format } from 'date-fns';
+import {
+  FileText, Calendar, Archive, ChevronDown, ChevronLeft, ChevronRight, Download, ExternalLink
+} from 'lucide-react';
+import { format, isBefore, parseISO, startOfDay, subDays } from 'date-fns';
 
 export default function EPaperViewer() {
   const [papers,   setPapers]   = useState<EPaper[]>([]);
@@ -12,12 +14,23 @@ export default function EPaperViewer() {
   useEffect(() => {
     epaperApi.list()
       .then(r => {
-        const list = r.data.data;
+        const list = [...(r.data.data ?? [])]
+          .sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime());
         setPapers(list);
         if (list.length) setSelected(list[0]);
       })
       .finally(() => setLoading(false));
   }, []);
+
+  const archiveCutoff = startOfDay(subDays(new Date(), 30));
+  const recentPapers = papers.filter(p => !isBefore(parseISO(p.date), archiveCutoff));
+  const archivedByMonth = papers
+    .filter(p => isBefore(parseISO(p.date), archiveCutoff))
+    .reduce<Record<string, EPaper[]>>((groups, paper) => {
+      const month = format(parseISO(paper.date), 'MMMM yyyy');
+      (groups[month] ??= []).push(paper);
+      return groups;
+    }, {});
 
   const currentIndex = papers.findIndex(p => p.id === selected?.id);
   const hasPrev      = currentIndex < papers.length - 1;
@@ -103,27 +116,74 @@ export default function EPaperViewer() {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
                 <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                  <Calendar size={14} /> Archive
+                  <Calendar size={14} /> Editions
                 </h3>
               </div>
-              <div className="divide-y divide-gray-50 max-h-[70vh] overflow-y-auto">
-                {papers.map(p => (
-                  <button
-                    key={p.id}
-                    onClick={() => setSelected(p)}
-                    className={`w-full text-left px-4 py-3 text-sm transition
-                      ${p.id === selected?.id
-                        ? 'bg-brand-50 text-brand-700 font-semibold'
-                        : 'text-gray-600 hover:bg-gray-50'}`}
-                  >
-                    <div className="font-medium">
-                      {format(new Date(p.date), 'dd MMM yyyy')}
-                    </div>
-                    <div className="text-xs text-gray-400 mt-0.5">
-                      {format(new Date(p.date), 'EEEE')}
-                    </div>
-                  </button>
-                ))}
+              <div className="max-h-[70vh] overflow-y-auto">
+                <section>
+                  <h4 className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    Last 30 days
+                  </h4>
+                  {recentPapers.length ? recentPapers.map(p => (
+                    <button
+                      key={p.id}
+                      onClick={() => setSelected(p)}
+                      className={`w-full text-left px-4 py-3 text-sm transition
+                        ${p.id === selected?.id
+                          ? 'bg-brand-50 text-brand-700 font-semibold'
+                          : 'text-gray-600 hover:bg-gray-50'}`}
+                    >
+                      <div className="font-medium">{format(parseISO(p.date), 'dd MMM yyyy')}</div>
+                      <div className="text-xs text-gray-400 mt-0.5">
+                        {format(parseISO(p.date), 'EEEE')}
+                      </div>
+                    </button>
+                  )) : (
+                    <p className="px-4 pb-3 text-xs text-gray-400">No editions in the last 30 days.</p>
+                  )}
+                </section>
+
+                <details className="border-t border-gray-100">
+                  <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+                    <span className="flex items-center gap-2">
+                      <Archive size={14} /> Archived
+                      <span className="text-xs font-normal text-gray-400">
+                        ({papers.length - recentPapers.length})
+                      </span>
+                    </span>
+                    <ChevronDown size={14} className="text-gray-400" />
+                  </summary>
+                  {Object.entries(archivedByMonth).map(([month, monthPapers]) => (
+                    <details key={month} className="border-t border-gray-50">
+                      <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-2.5 text-sm text-gray-600 hover:bg-gray-50">
+                        <span>{month}</span>
+                        <span className="flex items-center gap-2 text-xs text-gray-400">
+                          {monthPapers.length} <ChevronDown size={12} />
+                        </span>
+                      </summary>
+                      {monthPapers.map(p => (
+                        <button
+                          key={p.id}
+                          onClick={() => setSelected(p)}
+                          className={`w-full text-left px-7 py-2.5 text-sm transition
+                            ${p.id === selected?.id
+                              ? 'bg-brand-50 text-brand-700 font-semibold'
+                              : 'text-gray-600 hover:bg-gray-50'}`}
+                        >
+                          <div className="font-medium">{format(parseISO(p.date), 'dd MMM yyyy')}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">
+                            {format(parseISO(p.date), 'EEEE')}
+                          </div>
+                        </button>
+                      ))}
+                    </details>
+                  ))}
+                  {!Object.keys(archivedByMonth).length && (
+                    <p className="px-4 pb-3 text-xs text-gray-400">
+                      No older editions are available yet.
+                    </p>
+                  )}
+                </details>
               </div>
             </div>
           </aside>
