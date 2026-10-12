@@ -92,8 +92,12 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-14 gap-2">
 
           {/* Logo */}
-          <Link to="/" className="font-serif text-xl font-bold text-gray-900 tracking-tight shrink-0">
-              प्रजातंत्र <span className="text-brand-600">की गूंज</span>
+          <Link to="/" className="shrink-0 inline-flex flex-col font-sans leading-none">
+            <span className="ml-0 text-[12px] font-bold text-[#ff003b]">दैनिक</span>
+            <span className="whitespace-nowrap text-2xl sm:text-[20px] font-extrabold tracking-tight leading-none">
+              <span className="text-[#ff003b]">प्रजातंत्र</span>{' '}
+              <span className="text-black">की गूंज</span>
+            </span>
           </Link>
 
           {/* Desktop nav */}

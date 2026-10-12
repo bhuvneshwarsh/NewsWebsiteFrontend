@@ -15,14 +15,17 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-gray-900 text-gray-400 mt-16">
+    <footer className="bg-gray-800 text-gray-400 mt-16">
       <div className="container mx-auto px-4 py-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
 
           {/* Brand */}
           <div className="md:col-span-1">
-            <h3 className="font-serif text-xl font-bold text-white mb-2">
+            <h3 className="inline-flex flex-col font-sans leading-none text-white mb-2">
+              <span className="ml-0 text-[12px] font-bold">दैनिक</span>
+              <span className="whitespace-nowrap text-2xl font-extrabold tracking-tight leading-none">
                 प्रजातंत्र <span className="text-brand-500">की गूंज</span>
+              </span>
             </h3>
             <p className="text-sm leading-relaxed">
               आपका विश्वसनीय समाचार स्रोत — ताज़ी खबरें, गहरी रिपोर्ट और ई-पेपर।
@@ -134,10 +137,10 @@ export default function Footer() {
               </Link>
             </div>
 
-            <div className="text-gray-500 leading-relaxed">
+            <div className="text-gray-200 leading-relaxed">
               <div>{formattedDate}</div>
               <div>
-                © {year} Prajatantr Ki Gunj | Developed and Maintained by Bhuvneshwar Sharma
+                © {year} Prajatantr Ki Gunj | Developed and Maintained by Bhuvneshwar Sharma with ❤️
                 (Senior Software Engineer - Full Stack Web Developer).
               </div>
             </div>

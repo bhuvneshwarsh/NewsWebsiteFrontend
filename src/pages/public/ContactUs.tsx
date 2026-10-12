@@ -20,7 +20,7 @@ export default function ContactUs() {
   };
 
   const contactInfo = [
-    { icon: Mail,    label: 'Email',    value: 'prajatantrakigunj@gmail.com',  href: 'mailto:prajatantrakigunj@gmail.com' },
+    { icon: Mail,    label: 'Email',    value: 'prajatantrkigunj@gmail.com',  href: 'mailto:prajatantrkigunj@gmail.com' },
     { icon: Phone,   label: 'Phone',   value: '+91 97544 22061 \n & 0751 - 4901010',                href: 'tel:+919754422061' },
     { icon: MapPin,  label: 'Address', value: '70, Balaji Puram, Aditya Puram Phase-2, Murar, Gwalior, India',        href: null },
     { icon: Clock,   label: 'Hours',   value: 'Mon–Sat, 9 AM – 6 PM IST',      href: null },

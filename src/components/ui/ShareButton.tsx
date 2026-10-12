@@ -109,7 +109,8 @@ export default function ShareButton({
           />
 
           {/* Panel */}
-          <div className="absolute z-50 right-0 top-full mt-2 w-64
+          <div className="absolute z-50 left-1/2 -translate-x-1/2 top-full mt-2
+            w-64 max-w-[calc(100vw-1rem)]
             bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
 
             {/* Header */}

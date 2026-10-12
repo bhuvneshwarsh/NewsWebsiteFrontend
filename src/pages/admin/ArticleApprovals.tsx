@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
+import { parseApiTimestamp } from '../../utils/date';
 import {
   CheckCircle, XCircle, Eye, Clock,
   User, FileText, AlertTriangle, RefreshCw, X
@@ -27,7 +28,7 @@ interface ArticleDetail extends ArticleItem {
   publishedAt: string | null;
 }
 
-// ── Preview Modal ─────────────────────────────────────────────────────────────
+//  Preview Modal ---------------
 function PreviewModal({ article, onClose, onApprove, onReject }: {
   article:   ArticleItem;
   onClose:   () => void;
@@ -92,7 +93,7 @@ function PreviewModal({ article, onClose, onApprove, onReject }: {
               </h2>
               <p className="text-xs text-gray-400 mt-0.5">
                 By {article.authorName} ·{' '}
-                {format(new Date(article.createdAt), 'dd MMM yyyy, h:mm a')}
+                {format(parseApiTimestamp(article.createdAt), 'dd MMM yyyy, h:mm a')}
               </p>
             </div>
           </div>
@@ -133,7 +134,7 @@ function PreviewModal({ article, onClose, onApprove, onReject }: {
                 <span className="bg-gray-100 text-gray-600 text-xs px-2.5 py-1
                   rounded-full flex items-center gap-1">
                   <Clock size={10} />
-                  {format(new Date(detail.createdAt), 'dd MMM yyyy')}
+                  {format(parseApiTimestamp(detail.createdAt), 'dd MMM yyyy')}
                 </span>
               </div>
               <h1 className="font-serif text-xl font-bold text-gray-900 mb-4
@@ -378,7 +379,7 @@ export default function ArticleApprovals() {
                     </span>
                     <span className="flex items-center gap-1">
                       <Clock size={11} />
-                      {format(new Date(article.createdAt), 'dd MMM yyyy, h:mm a')}
+                      {format(parseApiTimestamp(article.createdAt), 'dd MMM yyyy, h:mm a')}
                     </span>
                   </div>
                 </div>

@@ -4,6 +4,7 @@ import { articlesApi } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { Pencil, Trash2, Eye, Plus, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
+import { parseApiTimestamp } from '../../utils/date';
 
 export default function ArticleList() {
   const [articles, setArticles] = useState<any[]>([]);
@@ -136,7 +137,7 @@ export default function ArticleList() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">
-                        {format(new Date(a.createdAt), 'dd MMM yyyy')}
+                        {format(parseApiTimestamp(a.createdAt), 'dd MMM yyyy')}
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">

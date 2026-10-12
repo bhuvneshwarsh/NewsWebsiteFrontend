@@ -4,6 +4,7 @@ import { Eye, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import type { ArticleListItem } from '../../types';
 import ShareButton from './ShareButton';
+import { parseApiTimestamp } from '../../utils/date';
 
 function isValidUrl(url: string | null | undefined): boolean {
   if (!url) return false;
@@ -41,7 +42,7 @@ interface Props {
 
 export default function ArticleCard({ article, featured = false }: Props) {
   const timeAgo = article.publishedAt
-    ? formatDistanceToNow(new Date(article.publishedAt), { addSuffix: true })
+    ? formatDistanceToNow(parseApiTimestamp(article.publishedAt), { addSuffix: true })
     : '';
 
   // ── Featured hero card ────────────────────────────────────────────────────

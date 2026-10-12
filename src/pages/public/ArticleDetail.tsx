@@ -8,6 +8,7 @@ import ShareButton from '../../components/ui/ShareButton';
 import { useMetaTags } from '../../hooks/useMetaTags';
 import { Clock, Eye, User, ChevronRight, ArrowLeft } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
+import { parseApiTimestamp } from '../../utils/date';
 
 function isValidUrl(url: string | null | undefined): boolean {
   if (!url) return false;
@@ -150,10 +151,10 @@ export default function ArticleDetailPage() {
                 {article.publishedAt && (
                   <span className="flex items-center gap-1.5">
                     <Clock size={14} />
-                    {format(new Date(article.publishedAt), 'dd MMM yyyy, h:mm a')}
+                    {format(parseApiTimestamp(article.publishedAt), 'dd MMM yyyy, h:mm a')}
                     <span className="text-gray-300">
                       ({formatDistanceToNow(
-                        new Date(article.publishedAt), { addSuffix: true })})
+                        parseApiTimestamp(article.publishedAt), { addSuffix: true })})
                     </span>
                   </span>
                 )}
