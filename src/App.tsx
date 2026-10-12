@@ -40,6 +40,7 @@ const TeamManager      = lazy(() => import('./pages/admin/TeamManager'));
 const AdManager        = lazy(() => import('./pages/admin/AdManager'));
 const EditorManager    = lazy(() => import('./pages/admin/EditorManager'));
 const ArticleApprovals = lazy(() => import('./pages/admin/ArticleApprovals')); // ← NEW
+const ContactMessages = lazy(() => import('./pages/admin/ContactMessages'));
 
 function Spinner() {
   return (
@@ -98,6 +99,7 @@ export default function App() {
               <Route path="team"             element={<TeamManager />} />
               <Route path="editor-profiles"  element={<EditorManager />} />
               <Route path="ads"              element={<AdManager />} />
+              <Route path="contact-messages" element={<ContactMessages />} />
             </Route>
 
           </Routes>

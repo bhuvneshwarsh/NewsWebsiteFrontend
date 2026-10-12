@@ -4,7 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard, FileText, Image, Newspaper,
   LogOut, Users, Megaphone, UserSquare,
-  Menu, X, ChevronLeft, ChevronRight, ClipboardCheck
+  Menu, X, ChevronLeft, ChevronRight, ClipboardCheck, MessageSquare
 } from 'lucide-react';
 import api from '../../services/api';
 
@@ -57,6 +57,9 @@ export default function AdminLayout() {
     { to: '/admin/team',            label: 'Team Manager',     icon: Users            },
     { to: '/admin/editor-profiles', label: 'Editor Profiles',  icon: UserSquare       },
     { to: '/admin/ads',             label: 'Advertisements',   icon: Megaphone        },
+    ...(user.role === 'SuperAdmin'
+      ? [{ to: '/admin/contact-messages', label: 'Contact Messages', icon: MessageSquare }]
+      : []),
   ];
 
   const SidebarContent = ({ collapsed = false }: { collapsed?: boolean }) => (

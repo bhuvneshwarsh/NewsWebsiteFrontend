@@ -3,20 +3,35 @@ import {
   Mail, Phone, MapPin, Clock, Send, CheckCircle,
   Facebook, Twitter, Instagram, Youtube
 } from 'lucide-react';
+import { contactMessagesApi } from '../../services/api';
 
 export default function ContactUs() {
   const [form,      setForm]      = useState({ name: '', email: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [loading,   setLoading]   = useState(false);
+  const [error,     setError]     = useState('');
 
-  // NOTE: Replace this with a real email API (e.g. EmailJS, Azure Communication Services)
-  // For now it shows a success message after 1 second simulation
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1000)); // simulate sending
-    setSubmitted(true);
-    setLoading(false);
+    try {
+      await contactMessagesApi.submit({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        subject: form.subject.trim(),
+        message: form.message.trim(),
+      });
+      setSubmitted(true);
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message ??
+        err.response?.data?.Message ??
+        'We could not send your message. Please try again later.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const contactInfo = [
@@ -82,7 +97,11 @@ export default function ContactUs() {
               <p className="text-gray-500 text-sm">
                 Thank you for reaching out. We'll get back to you within 24 hours.
               </p>
-              <button onClick={() => { setSubmitted(false); setForm({ name: '', email: '', subject: '', message: '' }); }}
+              <button onClick={() => {
+                setSubmitted(false);
+                setError('');
+                setForm({ name: '', email: '', subject: '', message: '' });
+              }}
                 className="mt-5 text-brand-600 hover:underline text-sm font-medium">
                 Send another message
               </button>
@@ -90,6 +109,12 @@ export default function ContactUs() {
           ) : (
             <>
               <h2 className="font-semibold text-gray-800 text-lg mb-5">Send a Message</h2>
+              {error && (
+                <div role="alert" className="mb-4 p-3 bg-red-50 border border-red-200
+                  rounded-lg text-red-700 text-sm">
+                  {error}
+                </div>
+              )}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>

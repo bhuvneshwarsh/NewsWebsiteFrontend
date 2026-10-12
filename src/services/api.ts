@@ -28,6 +28,15 @@ export interface ApiResponse<T> {
   data:    T;
 }
 
+export interface ContactMessage {
+  id: number;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  submittedAt: string;
+}
+
 export interface PaginatedResult<T> {
   items:      T[];
   page:       number;
@@ -117,6 +126,13 @@ export const categoriesApi = {
   list: () => api.get<ApiResponse<any[]>>('/categories'),
 };
 
+// ── Contact messages API ──────────────────────────────────────────────────────
+export const contactMessagesApi = {
+  submit: (message: Omit<ContactMessage, 'id' | 'submittedAt'>) =>
+    api.post<ApiResponse<{ id: number }>>('/contact-messages', message),
+  list: () => api.get<ApiResponse<ContactMessage[]>>('/contact-messages'),
+};
+
 // ── Media API ─────────────────────────────────────────────────────────────────
 export const mediaApi = {
   upload: (file: File, onProgress?: (pct: number) => void) => {
@@ -142,21 +158,19 @@ export const mediaApi = {
 
 // ── EPaper API ────────────────────────────────────────────────────────────────
 export const epaperApi = {
-  list:   () => api.get<ApiResponse<any[]>>('/epapers'),
-  latest: () => api.get<ApiResponse<any>>('/epapers/latest'),
-  create: (data: any) => api.post<ApiResponse<any>>('/epapers', data),
-  delete: (id: number) => api.delete<ApiResponse<any>>(`/epapers/${id}`),
+  list:   () => api.get<ApiResponse<any[]>>('/epaper/list'),
+  latest: () => api.get<ApiResponse<any>>('/epaper'),
+  delete: (id: number) => api.delete<ApiResponse<any>>(`/epaper/${id}`),
 
-  // Upload EPaper PDF — uses mediaApi internally
+  // Upload and create an e-paper using the backend's multipart endpoint.
   upload: (file: File, date: string, onProgress?: (pct: number) => void) => {
     const form = new FormData();
     form.append('file', file);
     form.append('date', date);
-    return api.post<{ success: boolean; url: string }>(
-      '/media/upload?type=pdf',
+    return api.post<ApiResponse<any>>(
+      '/epaper',
       form,
       {
-        headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (e: any) => {
           if (onProgress && e.total) {
             onProgress(Math.round((e.loaded * 100) / e.total));

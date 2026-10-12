@@ -148,7 +148,7 @@ export default function EmployeeArticleEditor() {
             लेख सबमिट हो गया!
           </h2>
           <p className="text-gray-500 text-sm leading-relaxed mb-2">
-            आपका लेख Super Admin की समीक्षा के लिए भेज दिया गया है।
+            आपका लेख मुख्य संपादक (Chief Editor) की समीक्षा के लिए भेज दिया गया है।
           </p>
           <p className="text-gray-400 text-xs leading-relaxed mb-6">
             अनुमोदित होने के बाद यह वेबसाइट पर प्रकाशित हो जाएगा।
@@ -195,7 +195,7 @@ export default function EmployeeArticleEditor() {
               अनुमोदन प्रतीक्षारत
             </p>
             <p className="text-xs text-amber-700 mt-0.5">
-              यह लेख Super Admin की समीक्षा में है। अनुमोदित होने के बाद
+              यह लेख मुख्य संपादक (Chief Editor) की समीक्षा में है। अनुमोदित होने के बाद
               वेबसाइट पर दिखेगा।
             </p>
           </div>
@@ -212,7 +212,7 @@ export default function EmployeeArticleEditor() {
             </p>
             <p className="text-xs text-green-700 mt-0.5">
               यह लेख अनुमोदित और प्रकाशित हो चुका है।
-              बदलाव के लिए Super Admin से संपर्क करें।
+              बदलाव के लिए मुख्य संपादक (Chief Editor) से संपर्क करें।
             </p>
           </div>
         </div>
@@ -335,7 +335,7 @@ export default function EmployeeArticleEditor() {
                     : 'Submit for Approval'}
               </button>
               <p className="text-xs text-gray-400 text-center leading-relaxed">
-                लेख सबमिट करने के बाद Super Admin की समीक्षा के बाद प्रकाशित होगा।
+                लेख सबमिट करने के बाद मुख्य संपादक (Chief Editor) की समीक्षा के बाद प्रकाशित होगा।
               </p>
             </div>
           )}
@@ -344,7 +344,7 @@ export default function EmployeeArticleEditor() {
           <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4">
             <p className="text-xs text-blue-700 leading-relaxed">
               <strong>प्रकाशन प्रक्रिया:</strong> आपका लेख सबमिट होने के बाद
-              Super Admin समीक्षा करेंगे। अनुमोदित होने पर यह वेबसाइट पर
+              मुख्य संपादक (Chief Editor) समीक्षा करेंगे। अनुमोदित होने पर यह वेबसाइट पर
               तुरंत प्रकाशित हो जाएगा।
             </p>
           </div>
